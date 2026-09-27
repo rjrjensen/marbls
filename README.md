@@ -53,7 +53,7 @@ The Lindamans decided to use a deck of cards for each player instead of a commun
 
 ## How to play
 ### Setup
-Each player chooses a color and places all of their marbles in their home row and grabs a deck of cards. After shuffling the deck of cards, each player cuts the deck and shows the card in the middle of the deck. The player with the highest card (Ace is the high) goes first and the turns go clockwise around the board.
+Each player chooses a color and places all of their marbles in their home row and grabs a deck of cards (a standard 52-card deck plus two Jokers). After shuffling the deck of cards, each player cuts the deck and shows the card in the middle of the deck. The player with the highest card (Ace is the high) goes first and the turns go clockwise around the board.
 
 ### Play
 Once a starting player is determined, he/she draws a card off the top of their deck. If the player draws a "Can start a marble" card, then the player can move their first marble to their start space. If a move cannot be made, the next turn commences. If the player drew a card with a "Play again?" attribute, then the player draws again. Multiple "Play again?" cards can be played in succession. 
