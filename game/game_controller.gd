@@ -13,6 +13,8 @@ extends Node
 var _host: LocalMatchHost
 var _queue: Array[MatchEvent] = []
 var _busy: bool = false
+var _chooser := MoveChooser.new()
+var _choices: Array[MoveChoice] = []
 
 @onready var _board: BoardView = $Board
 @onready var _camera: BoardCamera = $BoardCamera
@@ -21,16 +23,21 @@ var _busy: bool = false
 
 func _ready() -> void:
 	_hud.draw_pressed.connect(press_draw)
-	_hud.new_game_requested.connect(func(seat_count: int) -> void: new_game(seat_count, randi()))
-	_board.ghost_tapped.connect(choose)
+	_hud.new_game_requested.connect(
+		func(seat_count: int, teams: bool) -> void: new_game(seat_count, randi(), teams)
+	)
+	_board.ghost_tapped.connect(_on_ghost_tapped)
 	_board.marble_tapped.connect(_on_marble_tapped)
 	new_game(default_seat_count, randi())
 
 
-func new_game(seat_count: int, seed_value: int) -> void:
+func new_game(seat_count: int, seed_value: int, teams: bool = false) -> void:
 	_queue.clear()
 	_busy = false
-	var game := Match.create_standard(RuleSet.new(), seat_count, seed_value)
+	var rules := RuleSet.new()
+	if teams and seat_count >= 4 and seat_count % 2 == 0:
+		rules.team_of_seat = RuleSet.opposite_partners(seat_count)
+	var game := Match.create_standard(rules, seat_count, seed_value)
 	_host = LocalMatchHost.new(game)
 	_host.events_emitted.connect(_on_events)
 	_board.build(_host.state())
@@ -108,6 +115,7 @@ func _present(event: MatchEvent) -> void:
 			await _pause(1.0)
 		MatchEvent.Kind.MARBLE_MOVED:
 			await _board.play_step(event.step, animate)
+			_announce_landing(event)
 		MatchEvent.Kind.MARBLE_KILLED:
 			_hud.show_message("%s killed %s's marble!" % [seat_name, SeatColors.display_name(event.victim.seat)])
 			if animate:
@@ -129,31 +137,45 @@ func _ready_for_input() -> void:
 		GameState.Phase.AWAITING_DRAW:
 			_hud.set_draw_enabled(true)
 		GameState.Phase.AWAITING_MOVE:
-			_hud.show_message("Tap a glowing ghost marble to move")
-			_board.show_choices(legal_moves(), _all_move_indices())
+			_chooser.reset(legal_moves())
+			_show_choices()
+
+
+func _show_choices() -> void:
+	_choices = _chooser.choices()
+	_board.show_choices(_choices)
+	if _chooser.depth() > 0:
+		_hud.show_message("Now the second marble: tap where it goes")
+	elif state().current_card != null and state().current_card.rank == Card.Rank.SEVEN:
+		_hud.show_message("Move one marble 7, or tap a ghost to split the 7 between two")
+	else:
+		_hud.show_message("Tap a glowing ghost marble to move")
+
+
+func _on_ghost_tapped(choice_index: int) -> void:
+	if _busy or state().phase != GameState.Phase.AWAITING_MOVE or choice_index >= _choices.size():
+		return
+	var move_index: int = _chooser.pick(_choices[choice_index])
+	if move_index >= 0:
+		choose(move_index)
+	else:
+		_show_choices()
 
 
 func _on_marble_tapped(ref: MarbleRef) -> void:
 	if _busy or state().phase != GameState.Phase.AWAITING_MOVE:
 		return
-	var indices: Array[int] = []
-	var tapped_in_block: bool = state().spot_of(ref).is_starting_block()
-	for index: int in legal_moves().size():
-		var step: MarbleStep = legal_moves()[index].steps[0]
-		var same_marble: bool = step.marble.equals(ref)
-		var starts_from_same_block: bool = tapped_in_block and step.from.is_starting_block() \
-				and step.marble.seat == ref.seat
-		if same_marble or starts_from_same_block:
-			indices.append(index)
-	# Tapping a marble that can't move shows every choice again.
-	_board.show_choices(legal_moves(), indices if not indices.is_empty() else _all_move_indices())
+	# Tapping a marble shows just its moves (and starts a split over).
+	_chooser.focus_marble(ref, state().spot_of(ref).is_starting_block())
+	_show_choices()
 
 
-func _all_move_indices() -> Array[int]:
-	var indices: Array[int] = []
-	for index: int in legal_moves().size():
-		indices.append(index)
-	return indices
+func _announce_landing(event: MatchEvent) -> void:
+	var owner: PlayerState = state().player(event.step.marble.seat)
+	if event.step.to.kind == Spot.Kind.BULLS_EYE:
+		_hud.show_message("Into the Bull's Eye! Only a Jack, Queen or King gets it out.")
+	elif owner.fast_track_ready[event.step.marble.marble]:
+		_hud.show_message("On the Fast Track! Ride it with your next card.")
 
 
 func _pause(seconds: float) -> void:

@@ -13,6 +13,8 @@ var _rng := RandomNumberGenerator.new()
 var _generator: MoveGenerator
 var _resolver := MoveResolver.new()
 var _legal_moves: Array[Move] = []
+## Whose marbles the card in play can move (see MoveGenerator.controlled_seats).
+var _movers: Array[int] = []
 
 
 ## [param seat_arms] lists the board arm each seat sits at, in clockwise
@@ -84,10 +86,11 @@ func _draw(events: Array[MatchEvent]) -> void:
 	var card: Card = deck.draw()
 	state.current_card = card
 	events.append(MatchEvent.with_card(MatchEvent.Kind.CARD_DRAWN, seat, card))
+	_movers = _generator.controlled_seats(state, seat)
 	_legal_moves = _generator.legal_moves(state, seat, card)
 	if _legal_moves.is_empty():
 		events.append(MatchEvent.with_card(MatchEvent.Kind.NO_LEGAL_MOVE, seat, card))
-		_finish_card(false, events)
+		_finish_card(null, events)
 	else:
 		state.phase = GameState.Phase.AWAITING_MOVE
 
@@ -99,26 +102,36 @@ func _choose(move_index: int, events: Array[MatchEvent]) -> void:
 	if move_index < 0 or move_index >= _legal_moves.size():
 		events.append(MatchEvent.rejected(state.current_seat, "That move isn't legal."))
 		return
-	events.append_array(_resolver.apply(state, _legal_moves[move_index]))
-	_finish_card(true, events)
+	var move: Move = _legal_moves[move_index]
+	events.append_array(_resolver.apply(state, move))
+	_finish_card(move, events)
 
 
 ## Discards the card in play, then ends the game, plays again, or passes the turn.
-func _finish_card(moved: bool, events: Array[MatchEvent]) -> void:
+## [param move] is what the card did, or null if it couldn't move anything.
+func _finish_card(move: Move, events: Array[MatchEvent]) -> void:
 	var seat: int = state.current_seat
 	var card: Card = state.current_card
 	state.player(seat).deck.discard(card)
 	state.current_card = null
 	_legal_moves = []
+	_update_fast_track(move)
+	_movers = []
 
-	if moved and state.player(seat).is_finished():
-		events.append(MatchEvent.new(MatchEvent.Kind.PLAYER_FINISHED, seat))
-		var winners: Array[int] = [seat]
-		state.winners = winners
-		state.phase = GameState.Phase.GAME_OVER
-		events.append(MatchEvent.game_over(winners))
-		return
+	if move != null:
+		for step: MarbleStep in move.steps:
+			var owner: int = step.marble.seat
+			if state.player(owner).is_finished() and not state.finished_seats.has(owner):
+				state.finished_seats.append(owner)
+				events.append(MatchEvent.new(MatchEvent.Kind.PLAYER_FINISHED, owner))
+		var winners: Array[int] = _winners()
+		if not winners.is_empty():
+			state.winners = winners
+			state.phase = GameState.Phase.GAME_OVER
+			events.append(MatchEvent.game_over(winners))
+			return
 
+	var moved: bool = move != null
 	if rules.plays_again(card.rank) and (moved or rules.play_again_without_move):
 		state.phase = GameState.Phase.AWAITING_DRAW
 		events.append(MatchEvent.with_card(MatchEvent.Kind.PLAY_AGAIN, seat, card))
@@ -126,6 +139,39 @@ func _finish_card(moved: bool, events: Array[MatchEvent]) -> void:
 
 	state.current_seat = (seat + 1) % state.seat_count()
 	_begin_turn(events)
+
+
+## The card in play was this seat's "next card" for every marble it could
+## have moved, so their Fast Track chances are used up. Marbles whose move
+## ended on a corner (other than their own color's) get a new chance.
+func _update_fast_track(move: Move) -> void:
+	for owner: int in _movers:
+		var player: PlayerState = state.player(owner)
+		for i: int in player.fast_track_ready.size():
+			player.fast_track_ready[i] = false
+	if move == null or not rules.fast_track_enabled:
+		return
+	if move.kind == Move.Kind.SWAP and not rules.swap_grants_fast_track:
+		return
+	for step: MarbleStep in move.steps:
+		var player: PlayerState = state.player(step.marble.seat)
+		var on_corner: bool = step.to.is_track() and state.topology.is_fast_track_corner(step.to.index)
+		var own_corner: bool = step.to.index == state.topology.own_fast_track_corner(player.arm)
+		player.fast_track_ready[step.marble.marble] = on_corner and not own_corner
+
+
+## The first player home wins; in a team game, the first team with everyone home.
+func _winners() -> Array[int]:
+	var winners: Array[int] = []
+	for seat: int in state.finished_seats:
+		var team: Array[int] = rules.team_members(seat)
+		var all_home: bool = true
+		for member: int in team:
+			if not state.finished_seats.has(member):
+				all_home = false
+		if all_home:
+			return team
+	return winners
 
 
 func _begin_turn(events: Array[MatchEvent]) -> void:
@@ -173,6 +219,7 @@ static func from_dict(data: Dictionary) -> Match:
 	restored._rng.seed = String(data["rng_seed"]).to_int()
 	restored._rng.state = String(data["rng_state"]).to_int()
 	if restored.state.phase == GameState.Phase.AWAITING_MOVE:
-		restored._legal_moves = restored._generator.legal_moves(
-				restored.state, restored.state.current_seat, restored.state.current_card)
+		var seat: int = restored.state.current_seat
+		restored._movers = restored._generator.controlled_seats(restored.state, seat)
+		restored._legal_moves = restored._generator.legal_moves(restored.state, seat, restored.state.current_card)
 	return restored

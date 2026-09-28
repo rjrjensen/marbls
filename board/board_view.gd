@@ -8,7 +8,8 @@ extends Node3D
 ## [GameController] decides what they mean.
 
 signal marble_tapped(ref: MarbleRef)
-signal ghost_tapped(move_index: int)
+## Index into the choices last passed to [method show_choices].
+signal ghost_tapped(choice_index: int)
 
 ## Length of each hub edge, in hole spacings (matches the physical board).
 const HUB_SIDE := 4.0
@@ -140,18 +141,17 @@ func sync_marbles(state: GameState) -> void:
 			marble_view(ref).global_position = rest_position(ref, p.marbles[i])
 
 
-## Makes the marbles that can move glow and shows a ghost at each destination,
-## for the moves at [param indices] in [param moves].
-func show_choices(moves: Array[Move], indices: Array[int]) -> void:
+## Makes each choice's marble glow and shows a ghost where it would go.
+func show_choices(choices: Array[MoveChoice]) -> void:
 	clear_choices()
-	for index: int in indices:
-		var step: MarbleStep = moves[index].steps[0]
-		marble_view(step.marble).set_glow(true)
+	for index: int in choices.size():
+		var choice: MoveChoice = choices[index]
+		marble_view(choice.marble).set_glow(true)
 		var ghost := marble_scene.instantiate() as MarbleView
 		_ghost_layer.add_child(ghost)
-		ghost.setup(SeatColors.color(step.marble.seat), true)
+		ghost.setup(SeatColors.color(choice.marble.seat), true)
 		ghost.move_index = index
-		ghost.global_position = rest_position(step.marble, step.to)
+		ghost.global_position = rest_position(choice.marble, choice.to)
 		ghost.tapped.connect(_on_ghost_tapped)
 
 
@@ -171,7 +171,10 @@ func play_step(step: MarbleStep, animate: bool) -> void:
 		return
 	for spot: Spot in step.path:
 		var target: Vector3 = rest_position(step.marble, spot)
-		await _hop(view, target, HOP_SECONDS, HOP_HEIGHT)
+		# Fast Track hops and swaps cover more ground: arc higher, a bit slower.
+		var distance: float = view.global_position.distance_to(target)
+		var stretch: float = clampf(distance, 1.0, 5.0)
+		await _hop(view, target, HOP_SECONDS * sqrt(stretch), HOP_HEIGHT * stretch)
 
 
 ## Sends a killed marble flying back to its Starting Block.
