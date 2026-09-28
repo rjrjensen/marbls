@@ -52,6 +52,18 @@ The Lindamans decided to use a deck of cards for each player instead of a commun
 `Rules are subject to change, of course. Sometimes midgame! (Cameron, looking at you...)`
 
 ## How to play
+### Terminology
+Kelsey's written instructions use different names for parts of the board. Both sets of names mean the same thing, and the code uses Kelsey's names.
+
+| This README | Kelsey's instructions (and the code) | What it is |
+| --- | --- | --- |
+| Home row | **Starting Block** | The four colored spaces where a player's marbles begin (the diagonal rows of four) |
+| Start space | **Starting Exit** | The colored space on the outer edge where marbles enter the track |
+| The board / the path | **Main Track** | The loop of holes that marbles travel around clockwise |
+| Finish lane / finish row | **Home Base** | The colored row of four spaces where marbles finish |
+| Fast Track space | **Fast Track** | The four colored inner corners of the Main Track, closest to the center |
+| Bull's Eye | **Bull's Eye** | The center hole |
+
 ### Setup
 Each player chooses a color and places all of their marbles in their home row and grabs a deck of cards (a standard 52-card deck plus two Jokers). After shuffling the deck of cards, each player cuts the deck and shows the card in the middle of the deck. The player with the highest card (Ace is the high) goes first and the turns go clockwise around the board.
 
@@ -71,11 +83,15 @@ Notes
 * A marble cannot land on another marble of the same color or surpass a marble of the same color on the board. The marble in front of it must be moved first.
 * If a marble lands on a marble of another color, that opposing marble is considered killed, murdered in cold blood even, and the body is removed from the board and placed back in the home row. (This graphic nature is derived from Kelsey's ruthlessness in past games. She enjoys murder.)
 * The fastest route for a marble into the finish lane is for the marble to start on the start space and for the player to draw a four, moving the marble close to the entrance of the lane.
+* **Moving backward (the Four).** Backward moves follow the same rules as forward moves: a marble can't land on or hop over a marble of its own color, and landing on another color kills it. A marble moving backward may pass its own start space and the entrance to its finish lane, and then later move forward into its finish lane without going all the way around the board. A Four can also move a marble backward onto a Fast Track space or into the Bull's Eye.
+* **Finish lane marbles are safe.** Once a marble is in its finish lane, it can't be killed, moved backward, or taken out. It can only move forward within the lane, to make room for the rest.
+* **Jack swap.** The Jack can swap one of your marbles with any other marble of a different color on the board.
+* **Seven split.** The two marbles can be two of your own, or one of yours and one of your teammate's. At least one of your own marbles has to move at least one space.
 
 ### Fast Track and Bull's Eye
 Each inner corner pointing towards the middle of the board is called a Fast Track space. If your marble has just enough moves to land on this space, then during the next turn, you can use the next card you draw to move around to other Fast Track spaces, skipping the path around to get to them. If you don't use the next card you draw to move the marble that landed on the Fast Track space, then that chance is lost and that marble will have to continue moving around the board regularly. On the Fast Track, once your marble lands on the space nearest your finish lane (which should be the same color as your finish lane), the marble must exit the Fast Track and continue towards the finish lane.
 
-The Bull's Eye is the space in the center of the board. If a marble lands on a Fast Track space and has one move left, the player can choose to move that marble to the Bull's Eye. This is a gamble because the only way out of the Bull's Eye is to draw a face card (Jack, Queen, or King). Once a face card is drawn, the marble can be moved to the Fast Track space nearest the players finish lane.
+The Bull's Eye is the space in the center of the board. If a marble on the Main Track (not one already riding the Fast Track) lands on a Fast Track space and has one move left, the player can choose to move that marble to the Bull's Eye. This is a gamble because the only way out of the Bull's Eye is to draw a face card (Jack, Queen, or King). Once a face card is drawn, the marble can be moved to the Fast Track space nearest the players finish lane.
 
 ### Goal
 The goal for each player is to get all of his or her own marbles into the finish lane. 
@@ -92,7 +108,7 @@ Kill all opponents at every chance. Don't even try to win the game. No one is sa
 
 
 ## Notes
-* The documentation Kelsey provided uses different terminology for various parts of the the game than what I have in this documentation. I will include her document in this repository.
+* Kelsey's original written instructions have been merged into this README (see Terminology). Where the two disagreed, the family's decisions are recorded in [docs/DESIGN.md](docs/DESIGN.md) under "Rules: decisions and open questions".
 
 
 [board]: https://i.etsystatic.com/11793226/r/il/2c1ed6/1279172207/il_570xN.1279172207_fqc9.jpg "Aggravation game board"
