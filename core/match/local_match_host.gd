@@ -4,7 +4,9 @@ extends RefCounted
 ## games talk to a RemoteMatchHost with the same shape, and the server runs a
 ## LocalMatchHost per table.
 
-signal event_emitted(event: MatchEvent)
+## Everything one intent (or the start) caused, in order. Events arrive in
+## batches so listeners see the state only after the whole batch applied.
+signal events_emitted(events: Array[MatchEvent])
 
 var _match: Match
 
@@ -31,5 +33,4 @@ func legal_moves() -> Array[Move]:
 
 
 func _emit_all(events: Array[MatchEvent]) -> void:
-	for event: MatchEvent in events:
-		event_emitted.emit(event)
+	events_emitted.emit(events)

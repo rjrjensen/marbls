@@ -1,0 +1,26 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://board/marble_view.gd" id="1_script"]
+
+[sub_resource type="SphereMesh" id="MarbleMesh"]
+radius = 0.3
+height = 0.6
+radial_segments = 32
+rings = 16
+
+[sub_resource type="SphereShape3D" id="TapShape"]
+radius = 0.5
+
+[node name="Marble" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("MarbleMesh")
+
+[node name="Area" type="Area3D" parent="."]
+input_ray_pickable = true
+
+[node name="Shape" type="CollisionShape3D" parent="Area"]
+shape = SubResource("TapShape")
+
+[connection signal="input_event" from="Area" to="." method="_on_area_input_event"]

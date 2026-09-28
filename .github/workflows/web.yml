@@ -1,0 +1,49 @@
+name: Web
+
+# Builds the web game on every PR and on master. With the Cloudflare secrets
+# set, master deploys to production (marbls.co) and each PR gets its own
+# preview URL (shown in the run summary).
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+concurrency:
+  group: web-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web:
+    name: Build and deploy web
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      PAGES_PROJECT: marbls
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Godot and export templates
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/godot
+          key: godot-web-${{ hashFiles('scripts/install_godot.sh', 'scripts/fetch_export_templates.py') }}
+
+      - name: Install Godot
+        run: echo "GODOT=$(scripts/install_godot.sh)" >> "$GITHUB_ENV"
+
+      - name: Build
+        run: scripts/build_web.sh
+
+      - name: Deploy to Cloudflare Pages
+        if: env.CLOUDFLARE_API_TOKEN != ''
+        run: |
+          branch="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
+          npx --yes wrangler@4 pages project create "$PAGES_PROJECT" --production-branch=master 2>/dev/null || true
+          npx --yes wrangler@4 pages deploy build/web --project-name="$PAGES_PROJECT" --branch="$branch" \
+            --commit-dirty=true | tee deploy.log
+          url=$(grep -oE 'https://[a-zA-Z0-9.-]+\.pages\.dev' deploy.log | tail -1)
+          echo "### Web build deployed" >> "$GITHUB_STEP_SUMMARY"
+          echo "Branch \`$branch\`: $url" >> "$GITHUB_STEP_SUMMARY"

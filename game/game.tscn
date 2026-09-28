@@ -1,0 +1,35 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/game_controller.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://board/board.tscn" id="2_board"]
+[ext_resource type="Script" path="res://board/board_camera.gd" id="3_camera"]
+[ext_resource type="PackedScene" path="res://ui/hud.tscn" id="4_hud"]
+
+[sub_resource type="Environment" id="TableEnvironment"]
+background_mode = 1
+background_color = Color(0.13, 0.22, 0.17, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.85, 0.82, 0.78, 1)
+ambient_light_energy = 0.3
+tonemap_mode = 0
+
+[node name="Game" type="Node"]
+script = ExtResource("1_script")
+
+[node name="Environment" type="WorldEnvironment" parent="."]
+environment = SubResource("TableEnvironment")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 0, 12, 0)
+light_energy = 0.95
+shadow_enabled = true
+
+[node name="Board" parent="." instance=ExtResource("2_board")]
+
+[node name="BoardCamera" type="Node3D" parent="."]
+script = ExtResource("3_camera")
+
+[node name="Camera" type="Camera3D" parent="BoardCamera"]
+current = true
+
+[node name="Hud" parent="." instance=ExtResource("4_hud")]

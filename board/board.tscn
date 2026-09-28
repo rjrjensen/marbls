@@ -1,0 +1,43 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://board/board_view.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://board/arm.tscn" id="2_arm"]
+[ext_resource type="PackedScene" path="res://board/starting_block.tscn" id="3_block"]
+[ext_resource type="PackedScene" path="res://board/marble.tscn" id="4_marble"]
+[ext_resource type="PackedScene" path="res://board/hole.tscn" id="5_hole"]
+
+[sub_resource type="StandardMaterial3D" id="WoodMaterial"]
+albedo_color = Color(0.62, 0.42, 0.22, 1)
+roughness = 0.5
+
+[sub_resource type="StandardMaterial3D" id="EdgeMaterial"]
+albedo_color = Color(0.55, 0.38, 0.2, 1)
+roughness = 0.6
+
+[sub_resource type="CylinderMesh" id="BaseMesh"]
+material = SubResource("WoodMaterial")
+top_radius = 10.0
+bottom_radius = 10.0
+height = 0.5
+radial_segments = 96
+rings = 1
+
+[node name="Board" type="Node3D"]
+script = ExtResource("1_script")
+arm_scene = ExtResource("2_arm")
+starting_block_scene = ExtResource("3_block")
+marble_scene = ExtResource("4_marble")
+
+[node name="Base" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
+mesh = SubResource("BaseMesh")
+
+[node name="BullsEye" parent="." instance=ExtResource("5_hole")]
+transform = Transform3D(1.3, 0, 0, 0, 1, 0, 0, 0, 1.3, 0, 0, 0)
+role = 3
+
+[node name="Pieces" type="Node3D" parent="."]
+
+[node name="Marbles" type="Node3D" parent="."]
+
+[node name="Ghosts" type="Node3D" parent="."]

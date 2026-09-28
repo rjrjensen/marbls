@@ -1,0 +1,95 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://board/hole.tscn" id="1_hole"]
+
+[node name="Arm" type="Node3D"]
+
+[node name="Track-8" parent="." instance=ExtResource("1_hole")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -1)
+role = 0
+number = -8
+
+[node name="Track-7" parent="." instance=ExtResource("1_hole")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -2)
+role = 0
+number = -7
+
+[node name="Track-6" parent="." instance=ExtResource("1_hole")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -3)
+role = 0
+number = -6
+
+[node name="Track-5" parent="." instance=ExtResource("1_hole")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -4)
+role = 0
+number = -5
+
+[node name="Track-4" parent="." instance=ExtResource("1_hole")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -5)
+role = 0
+number = -4
+
+[node name="Track-3" parent="." instance=ExtResource("1_hole")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -5)
+role = 0
+number = -3
+
+[node name="Track-2" parent="." instance=ExtResource("1_hole")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -5)
+role = 0
+number = -2
+
+[node name="Track-1" parent="." instance=ExtResource("1_hole")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, -5)
+role = 0
+number = -1
+
+[node name="Track0" parent="." instance=ExtResource("1_hole")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -5)
+role = 0
+number = 0
+
+[node name="Track1" parent="." instance=ExtResource("1_hole")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -4)
+role = 0
+number = 1
+
+[node name="Track2" parent="." instance=ExtResource("1_hole")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -3)
+role = 0
+number = 2
+
+[node name="Track3" parent="." instance=ExtResource("1_hole")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -2)
+role = 0
+number = 3
+
+[node name="Track4" parent="." instance=ExtResource("1_hole")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -1)
+role = 0
+number = 4
+
+[node name="Track5" parent="." instance=ExtResource("1_hole")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
+role = 0
+number = 5
+
+[node name="Home0" parent="." instance=ExtResource("1_hole")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -4)
+role = 1
+number = 0
+
+[node name="Home1" parent="." instance=ExtResource("1_hole")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3)
+role = 1
+number = 1
+
+[node name="Home2" parent="." instance=ExtResource("1_hole")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2)
+role = 1
+number = 2
+
+[node name="Home3" parent="." instance=ExtResource("1_hole")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1)
+role = 1
+number = 3
