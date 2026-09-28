@@ -14,6 +14,8 @@ Project context:
 
 Commands:
 - Run tests: `scripts/test.sh` (all) or `scripts/test.sh <name filter>`. It imports the project first and fails on any script error, so it doubles as the type/lint check. CI runs the same script.
+- Lint: `scripts/lint.sh` (gdlint, config in `gdlintrc`). CI runs lint + tests; PRs may be merged by Claude only when both pass.
+- Web build: `scripts/build_web.sh` → `build/web` (splits the >25 MiB engine file for Cloudflare Pages; `.github/workflows/web.yml` deploys it).
 - Godot binary: `godot` on PATH (installed by the session-start hook via `scripts/install_godot.sh`, which uses the official mirror; github.com downloads are blocked in Claude sessions).
 - Tests live in `tests/**/test_*.gd`, extend `TestCase`, and name methods `test_*`. Game code under `core/` needs tests.
 - GDScript gotchas: `match`, `pass` are keywords; avoid naming things after global functions (`wrap`, `clamp`, ...).
