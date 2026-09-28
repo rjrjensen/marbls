@@ -1,7 +1,8 @@
 class_name GameController
 extends Node
-## Runs a hot-seat game: owns the match host, plays its events on the board
-## one at a time, and turns taps into intents.
+## Runs a game on one device: owns the match host, plays its events on the
+## board one at a time, turns taps into intents, and lets computer players
+## (an [AIPlayer] per seat) take their turns.
 ##
 ## Children only get told what to show (passed down) and report taps
 ## (signaled up). Every event is also forwarded to the SignalBus.
@@ -9,12 +10,21 @@ extends Node
 ## Off in tests: everything snaps into place instantly.
 @export var animate: bool = true
 @export var default_seat_count: int = 4
+@export var default_vs_computer: bool = true
+## Seconds a computer player "thinks" before drawing or moving.
+@export var ai_think_seconds: float = 0.6
 
 var _host: LocalMatchHost
 var _queue: Array[MatchEvent] = []
 var _busy: bool = false
 var _chooser := MoveChooser.new()
 var _choices: Array[MoveChoice] = []
+## Computer players by seat; every other seat is a person on this device.
+var _ai_players: Dictionary[int, AIPlayer] = {}
+## Bumped by every new game, so a computer turn scheduled in an old game is dropped.
+var _generation: int = 0
+var _ai_pending: bool = false
+var _running_ai: bool = false
 
 @onready var _board: BoardView = $Board
 @onready var _camera: BoardCamera = $BoardCamera
@@ -24,27 +34,42 @@ var _choices: Array[MoveChoice] = []
 func _ready() -> void:
 	_hud.draw_pressed.connect(press_draw)
 	_hud.new_game_requested.connect(
-		func(seat_count: int, teams: bool) -> void: new_game(seat_count, randi(), teams)
+		func(seat_count: int, teams: bool, vs_computer: bool) -> void:
+			new_game(seat_count, randi(), teams, vs_computer)
 	)
 	_board.ghost_tapped.connect(_on_ghost_tapped)
 	_board.marble_tapped.connect(_on_marble_tapped)
-	new_game(default_seat_count, randi())
+	new_game(default_seat_count, randi(), false, default_vs_computer)
 
 
-func new_game(seat_count: int, seed_value: int, teams: bool = false) -> void:
+## Starts a game. With [param vs_computer], you play Red (seat 0) and every
+## other seat is a computer personality; otherwise everyone shares the device.
+func new_game(seat_count: int, seed_value: int, teams: bool = false, vs_computer: bool = false) -> void:
+	_generation += 1
 	_queue.clear()
 	_busy = false
+	_ai_pending = false
 	var rules := RuleSet.new()
 	if teams and seat_count >= 4 and seat_count % 2 == 0:
 		rules.team_of_seat = RuleSet.opposite_partners(seat_count)
 	var game := Match.create_standard(rules, seat_count, seed_value)
+	_ai_players.clear()
+	if vs_computer:
+		for seat: int in range(1, seat_count):
+			_ai_players[seat] = AIPlayer.new(AIPresets.for_opponent(seat - 1), rules, seed_value + seat)
 	_host = LocalMatchHost.new(game)
 	_host.events_emitted.connect(_on_events)
 	_board.build(_host.state())
 	_camera.frame(_board.radius())
+	if _single_human_seat() >= 0:
+		_camera.face(_board.arm_direction(state().player(_single_human_seat()).arm), false)
 	_hud.show_card(null)
 	_hud.show_message("Tap Draw to start")
 	_host.start()
+
+
+func is_computer(seat: int) -> bool:
+	return _ai_players.has(seat)
 
 
 func state() -> GameState:
@@ -57,7 +82,7 @@ func legal_moves() -> Array[Move]:
 
 ## Draws for whoever's turn it is, if drawing is allowed right now.
 func press_draw() -> void:
-	if _busy or state().phase != GameState.Phase.AWAITING_DRAW:
+	if _busy or state().phase != GameState.Phase.AWAITING_DRAW or is_computer(state().current_seat):
 		return
 	_board.clear_choices()
 	_host.submit(MatchIntent.draw_card(state().current_seat))
@@ -65,7 +90,7 @@ func press_draw() -> void:
 
 ## Plays the legal move at [param move_index].
 func choose(move_index: int) -> void:
-	if _busy or state().phase != GameState.Phase.AWAITING_MOVE:
+	if _busy or state().phase != GameState.Phase.AWAITING_MOVE or is_computer(state().current_seat):
 		return
 	_board.clear_choices()
 	_host.submit(MatchIntent.choose_move(state().current_seat, move_index))
@@ -98,12 +123,13 @@ func _play_queue() -> void:
 
 
 func _present(event: MatchEvent) -> void:
-	var seat_name: String = SeatColors.display_name(event.seat) if event.seat >= 0 else ""
+	var seat_name: String = _seat_name(event.seat) if event.seat >= 0 else ""
 	match event.kind:
 		MatchEvent.Kind.TURN_STARTED:
-			_hud.show_turn(seat_name, SeatColors.color(event.seat))
+			_hud.show_turn(_turn_title(event.seat), SeatColors.color(event.seat))
 			_hud.show_deck_count(state().player(event.seat).deck.draw_pile.size())
-			await _camera.face(_board.arm_direction(state().player(event.seat).arm), animate)
+			if _single_human_seat() < 0:
+				await _camera.face(_board.arm_direction(state().player(event.seat).arm), animate)
 		MatchEvent.Kind.DECK_RESHUFFLED:
 			_hud.show_message("Out of cards: reshuffled the deck")
 		MatchEvent.Kind.CARD_DRAWN:
@@ -117,7 +143,7 @@ func _present(event: MatchEvent) -> void:
 			await _board.play_step(event.step, animate)
 			_announce_landing(event)
 		MatchEvent.Kind.MARBLE_KILLED:
-			_hud.show_message("%s killed %s's marble!" % [seat_name, SeatColors.display_name(event.victim.seat)])
+			_hud.show_message("%s killed %s marble!" % [seat_name, _possessive(event.victim.seat)])
 			if animate:
 				_camera.shake()
 			await _board.play_kill(event.victim, state(), animate)
@@ -126,13 +152,21 @@ func _present(event: MatchEvent) -> void:
 		MatchEvent.Kind.GAME_OVER:
 			var names: PackedStringArray = []
 			for winner: int in event.winners:
-				names.append(SeatColors.display_name(winner))
-			_hud.show_game_over("%s wins!" % " & ".join(names))
+				names.append(_seat_name(winner))
+			if event.winners.has(_single_human_seat()):
+				_hud.show_game_over("You win!" if event.winners.size() == 1 else "Your team wins!")
+			else:
+				_hud.show_game_over("%s win%s!" % [" & ".join(names), "" if names.size() > 1 else "s"])
 		MatchEvent.Kind.INTENT_REJECTED:
 			_hud.show_message(event.reason)
 
 
 func _ready_for_input() -> void:
+	if state().phase != GameState.Phase.GAME_OVER and is_computer(state().current_seat):
+		_hud.set_draw_enabled(false)
+		_hud.show_message("%s is thinking..." % _seat_name(state().current_seat))
+		_schedule_computer_turn()
+		return
 	match state().phase:
 		GameState.Phase.AWAITING_DRAW:
 			_hud.set_draw_enabled(true)
@@ -176,6 +210,66 @@ func _announce_landing(event: MatchEvent) -> void:
 		_hud.show_message("Into the Bull's Eye! Only a Jack, Queen or King gets it out.")
 	elif owner.fast_track_ready[event.step.marble.marble]:
 		_hud.show_message("On the Fast Track! Ride it with your next card.")
+
+
+## Lets the computer act. Animated games wait a moment first; instant games
+## (tests) run computer turns in a loop rather than recursively.
+func _schedule_computer_turn() -> void:
+	if animate:
+		var generation: int = _generation
+		await get_tree().create_timer(ai_think_seconds).timeout
+		if generation == _generation and not _busy:
+			_computer_act()
+		return
+	_ai_pending = true
+	if _running_ai:
+		return
+	_running_ai = true
+	while _ai_pending:
+		_ai_pending = false
+		_computer_act()
+	_running_ai = false
+
+
+func _computer_act() -> void:
+	var seat: int = state().current_seat
+	var ai: AIPlayer = _ai_players.get(seat)
+	if ai == null:
+		return
+	match state().phase:
+		GameState.Phase.AWAITING_DRAW:
+			_host.submit(MatchIntent.draw_card(seat))
+		GameState.Phase.AWAITING_MOVE:
+			_host.submit(MatchIntent.choose_move(seat, ai.choose_move(state(), seat, legal_moves())))
+
+
+## The only person playing on this device, or -1 (hot-seat or no people).
+func _single_human_seat() -> int:
+	var humans: Array[int] = []
+	for seat: int in state().seat_count():
+		if not is_computer(seat):
+			humans.append(seat)
+	return humans[0] if humans.size() == 1 and not _ai_players.is_empty() else -1
+
+
+func _seat_name(seat: int) -> String:
+	if is_computer(seat):
+		return (_ai_players[seat] as AIPlayer).profile.display_name
+	if seat == _single_human_seat():
+		return "You"
+	return SeatColors.display_name(seat)
+
+
+func _possessive(seat: int) -> String:
+	return "your" if seat == _single_human_seat() else _seat_name(seat) + "'s"
+
+
+func _turn_title(seat: int) -> String:
+	if seat == _single_human_seat():
+		return "Your turn"
+	if is_computer(seat):
+		return "%s's turn (%s)" % [_seat_name(seat), SeatColors.display_name(seat)]
+	return "%s's turn" % _seat_name(seat)
 
 
 func _pause(seconds: float) -> void:

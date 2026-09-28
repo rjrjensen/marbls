@@ -4,7 +4,7 @@ extends CanvasLayer
 ## what the player pressed; it never touches game state.
 
 signal draw_pressed
-signal new_game_requested(seat_count: int, teams: bool)
+signal new_game_requested(seat_count: int, teams: bool, vs_computer: bool)
 
 const SUIT_NAMES: PackedStringArray = ["Clubs", "Diamonds", "Hearts", "Spades", ""]
 const MIN_SEATS := 2
@@ -12,6 +12,7 @@ const MAX_SEATS := 8
 
 var _last_seat_count: int = 4
 var _last_teams: bool = false
+var _last_vs_computer: bool = true
 
 @onready var _turn_label: Label = %TurnLabel
 @onready var _message_label: Label = %MessageLabel
@@ -24,6 +25,7 @@ var _last_teams: bool = false
 @onready var _seat_buttons: GridContainer = %SeatButtons
 @onready var _close_menu_button: Button = %CloseMenuButton
 @onready var _teams_toggle: CheckButton = %TeamsToggle
+@onready var _computer_toggle: CheckButton = %ComputerToggle
 @onready var _game_over_panel: Control = %GameOverPanel
 @onready var _winner_label: Label = %WinnerLabel
 @onready var _play_again_button: Button = %PlayAgainButton
@@ -34,20 +36,25 @@ func _ready() -> void:
 	_draw_button.pressed.connect(draw_pressed.emit)
 	_menu_button.pressed.connect(func() -> void: _new_game_panel.visible = true)
 	_close_menu_button.pressed.connect(func() -> void: _new_game_panel.visible = false)
-	_play_again_button.pressed.connect(func() -> void: _request_new_game(_last_seat_count, _last_teams))
+	_play_again_button.pressed.connect(
+		func() -> void: _request_new_game(_last_seat_count, _last_teams, _last_vs_computer)
+	)
 	for seat_count: int in range(MIN_SEATS, MAX_SEATS + 1):
 		var button := Button.new()
 		button.text = "%d players" % seat_count
 		button.custom_minimum_size = Vector2(170, 80)
 		button.add_theme_font_size_override("font_size", 28)
-		button.pressed.connect(func() -> void: _request_new_game(seat_count, _teams_toggle.button_pressed))
+		button.pressed.connect(
+			func() -> void:
+				_request_new_game(seat_count, _teams_toggle.button_pressed, _computer_toggle.button_pressed)
+		)
 		_seat_buttons.add_child(button)
 	_new_game_panel.visible = false
 	_game_over_panel.visible = false
 
 
-func show_turn(seat_name: String, color: Color) -> void:
-	_turn_label.text = "%s's turn" % seat_name
+func show_turn(title: String, color: Color) -> void:
+	_turn_label.text = title
 	_turn_label.add_theme_color_override("font_color", color)
 
 
@@ -81,9 +88,10 @@ func show_game_over(text: String) -> void:
 	_game_over_panel.visible = true
 
 
-func _request_new_game(seat_count: int, teams: bool) -> void:
+func _request_new_game(seat_count: int, teams: bool, vs_computer: bool) -> void:
 	_last_seat_count = seat_count
 	_last_teams = teams
+	_last_vs_computer = vs_computer
 	_new_game_panel.visible = false
 	_game_over_panel.visible = false
-	new_game_requested.emit(seat_count, teams)
+	new_game_requested.emit(seat_count, teams, vs_computer)
