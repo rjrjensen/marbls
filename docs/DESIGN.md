@@ -380,6 +380,9 @@ The alternative is an all-in-one game backend such as **Nakama**, which bundles 
 | Leaving the Bull's Eye | **Jack, Queen or King.** (Kelsey's card table listed only Queen/King; that is superseded.) |
 | Fast Track use-it-or-lose-it | **The very next card.** If that card doesn't move the Fast Track marble, the chance is lost and it goes the long way. |
 | Deck composition | **52 cards + 2 Jokers per player.** |
+| Fast Track movement | A marble whose move **ends exactly on a Fast Track corner** can ride the Fast Track with its owner's **next card**. **Each point of that card is one decision:** hop to the next corner, or step off onto the Main Track. Once it steps off, the rest of the count goes along the Main Track. At its own color's corner it must step off toward Home Base. It can't land on or hop over its own marbles on the corners, so it has to step off before them. Landing on a teammate kills it, so you'd normally step off early. A move that ends on a corner again keeps the chance for the next card. |
+| Jack swap | Swap one of your marbles with any other color's marble on the **Main Track (including Fast Track corners and Starting Exits) or in the Bull's Eye**, but not one in a Starting Block or Home Base. **Swapping with a teammate is allowed** (it can be strategic). |
+| Seven split | Very flexible: **either or both halves can kill, and either or both can go into Home Base.** (Still true: split between exactly two marbles, all 7 used, at least one of your own marbles moves.) |
 
 ### Idea: the Comeback Joker
 
@@ -397,14 +400,12 @@ After a player loses N games in a row, their deck gets an extra Joker until they
 
 Each answer becomes a `RuleSet` field with a default, so house-rule variants cost nothing later.
 
-1. **Cutting for first player.** How does a Joker rank, and how are ties broken?
-2. **Fast Track movement.** Does each hop between corners cost 1 point of movement? Can one card carry a marble around the Fast Track *and then* along the main track?
-3. **Jack swap.** Can you swap with marbles on the Fast Track, in the Bull's Eye, or on someone's Starting Exit? With a teammate's marble? Does a swap count as a kill? (Presumably no.) Does a Jack that *swaps* a marble onto a Fast Track corner start a Fast Track chance?
-4. **Home Base.** Is an exact count required to enter or move within it? Can a marble jump over its own marbles there? (The "never hop your own color" rule suggests no.)
-5. **Play-again with no legal move.** If you draw an Ace but no move is possible, do you still draw again? (Presumably yes.)
-6. **Kills.** Can you kill a marble sitting on its own Starting Exit? Can you kill in the Bull's Eye?
-7. **Four backwards.** Can a 4 move a marble backwards *out of* the Fast Track or Bull's Eye, or only *into* them?
-8. **Seven split.** Can the two halves kill? Can one half go into the Home Base?
+1. **Cutting for first player.** How does a Joker rank, and how are ties broken? (Currently: Joker above Ace; tied players cut again.)
+2. **Jack swap onto a corner.** Does a marble that is *swapped* onto a Fast Track corner get a Fast Track chance? (Assumed no: it didn't land there with a move.)
+3. **Home Base.** Is an exact count required to enter or move within it? Can a marble jump over its own marbles there? (Currently: exact fit, no jumping.)
+4. **Play-again with no legal move.** If you draw an Ace but no move is possible, do you still draw again? (Currently: yes.)
+5. **Kills.** Can you kill a marble sitting on its own Starting Exit? Can you kill in the Bull's Eye? (Currently: yes to both.)
+6. **Four backwards.** Can a 4 move a marble backwards *out of* the Fast Track or Bull's Eye, or only *into* them?
 
 ---
 
@@ -436,7 +437,7 @@ This is the plan of record for now, and it may change after more research.
 
 **Watch-outs:**
 
-- **Cloudflare Pages allows at most 25 MiB per file.** Godot's web engine file (`.wasm`) may be larger. We'll measure it at the first web export. If it's too big, either host that one file on Cloudflare R2 (object storage with free egress), or build a slimmed-down export template that leaves out unused engine features. The slim template also makes the web game load faster on phones, so it's worth doing anyway.
+- **Cloudflare Pages allows at most 25 MiB per file, and Godot 4.7's web engine (`.wasm`) is 39.5 MB.** `scripts/build_web.sh` splits it into ~20 MB parts, and a tiny loader in the page (`export_presets.cfg` → `html/head_include`) joins them in the browser. Cloudflare still compresses the download (roughly 10 MB). A slimmed-down custom export template would cut load time on phones further; that's worth doing before launch.
 - **Supabase's free tier pauses a project after about a week with no activity.** The game server's regular traffic prevents that once people are playing. Move to Pro when we launch publicly.
 
 ### Is Fly.io a good choice for the game server?
@@ -523,7 +524,7 @@ Each milestone ends with something playable or testable.
    - `Card`, `Deck`, `BoardTopology`, `GameState`, `MoveGenerator`, `MoveResolver`, `Match`, and `LocalMatchHost` (intents in, events out).
    - Basic movement, starting, kills, Home Base, and play-again.
    - Full unit tests, and seeded, serializable state. No UI yet.
-2. **Hot-seat prototype.**
+2. ✅ **Hot-seat prototype.** (Web deploy switches on once the Cloudflare secrets are set.)
    - A 3D board built from `Arm`/`Hole`/`Marble` scenes, with the tilted `BoardCamera`, tap-to-move, and Guided and Standard assist levels.
    - Placeholder art, and the quick-hit kill effect.
    - Namecheap → Cloudflare DNS, and the first web deploy to marbls.co so the family can try it.
