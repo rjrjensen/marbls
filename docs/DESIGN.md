@@ -78,7 +78,7 @@ res://
 ├── board/                     # Scenes: Board, Arm, Hole, Marble, BoardCamera
 ├── ui/                        # Hand/deck view, HUD, menus, lobby, chat
 ├── server/                    # Headless entry point for the online game server
-└── tests/                     # Test suites for core/ (gdUnit4 or a small built-in runner)
+└── tests/                     # Test suites for core/ (small built-in runner: scripts/test.sh)
 ```
 
 ### How this maps to the CLAUDE.md rules
@@ -516,10 +516,10 @@ What that means for the engineering, planned now so it's cheap later:
 
 Each milestone ends with something playable or testable.
 
-0. **Project setup.**
+0. ✅ **Project setup.**
    - Godot 4.7 project with the Compatibility renderer, typed-GDScript warnings set to errors, and the `SignalBus` autoload.
    - A test runner, and CI on GitHub Actions running headless tests on every PR.
-1. **Rules core, classic 4-player.**
+1. ✅ **Rules core, classic 4-player.** (Random full games at 2, 3, 4 and 6 players run in the tests.)
    - `Card`, `Deck`, `BoardTopology`, `GameState`, `MoveGenerator`, `MoveResolver`, `Match`, and `LocalMatchHost` (intents in, events out).
    - Basic movement, starting, kills, Home Base, and play-again.
    - Full unit tests, and seeded, serializable state. No UI yet.
