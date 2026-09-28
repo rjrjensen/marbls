@@ -1,0 +1,199 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://ui/hud.gd" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="BarStyle"]
+bg_color = Color(0.1, 0.07, 0.04, 0.82)
+content_margin_left = 18.0
+content_margin_top = 14.0
+content_margin_right = 18.0
+content_margin_bottom = 14.0
+
+[sub_resource type="StyleBoxFlat" id="CardStyle"]
+bg_color = Color(0.98, 0.96, 0.9, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+content_margin_left = 8.0
+content_margin_top = 6.0
+content_margin_right = 8.0
+content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxFlat" id="PanelStyle"]
+bg_color = Color(0.1, 0.07, 0.04, 0.94)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+content_margin_left = 28.0
+content_margin_top = 24.0
+content_margin_right = 28.0
+content_margin_bottom = 24.0
+
+[node name="Hud" type="CanvasLayer"]
+script = ExtResource("1_script")
+
+[node name="Root" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="TopBar" type="PanelContainer" parent="Root"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("BarStyle")
+
+[node name="Row" type="HBoxContainer" parent="Root/TopBar"]
+layout_mode = 2
+
+[node name="Text" type="VBoxContainer" parent="Root/TopBar/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TurnLabel" type="Label" parent="Root/TopBar/Row/Text"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 38
+text = "Marbls"
+
+[node name="MessageLabel" type="Label" parent="Root/TopBar/Row/Text"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.9, 0.8, 1)
+theme_override_font_sizes/font_size = 24
+autowrap_mode = 3
+
+[node name="MenuButton" type="Button" parent="Root/TopBar/Row"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(140, 70)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 24
+text = "New game"
+
+[node name="BottomBar" type="PanelContainer" parent="Root"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/panel = SubResource("BarStyle")
+
+[node name="Row" type="HBoxContainer" parent="Root/BottomBar"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 28
+
+[node name="Card" type="PanelContainer" parent="Root/BottomBar/Row"]
+custom_minimum_size = Vector2(120, 160)
+layout_mode = 2
+theme_override_styles/panel = SubResource("CardStyle")
+
+[node name="Face" type="VBoxContainer" parent="Root/BottomBar/Row/Card"]
+layout_mode = 2
+alignment = 1
+
+[node name="CardRank" type="Label" parent="Root/BottomBar/Row/Card/Face"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.1, 0.1, 0.1, 1)
+theme_override_font_sizes/font_size = 60
+text = "?"
+horizontal_alignment = 1
+
+[node name="CardSuit" type="Label" parent="Root/BottomBar/Row/Card/Face"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.1, 0.1, 0.1, 1)
+theme_override_font_sizes/font_size = 20
+horizontal_alignment = 1
+
+[node name="Actions" type="VBoxContainer" parent="Root/BottomBar/Row"]
+layout_mode = 2
+alignment = 1
+
+[node name="DrawButton" type="Button" parent="Root/BottomBar/Row/Actions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 110)
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "Draw"
+
+[node name="DeckLabel" type="Label" parent="Root/BottomBar/Row/Actions"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.9, 0.8, 1)
+theme_override_font_sizes/font_size = 20
+horizontal_alignment = 1
+
+[node name="NewGamePanel" type="PanelContainer" parent="Root"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("PanelStyle")
+
+[node name="Content" type="VBoxContainer" parent="Root/NewGamePanel"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="Title" type="Label" parent="Root/NewGamePanel/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 34
+text = "New game: how many players?"
+horizontal_alignment = 1
+
+[node name="SeatButtons" type="GridContainer" parent="Root/NewGamePanel/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+columns = 3
+
+[node name="CloseMenuButton" type="Button" parent="Root/NewGamePanel/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 70)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Keep playing"
+
+[node name="GameOverPanel" type="PanelContainer" parent="Root"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("PanelStyle")
+
+[node name="Content" type="VBoxContainer" parent="Root/GameOverPanel"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="WinnerLabel" type="Label" parent="Root/GameOverPanel/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 44
+horizontal_alignment = 1
+
+[node name="PlayAgainButton" type="Button" parent="Root/GameOverPanel/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 90)
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Play again"

@@ -1,14 +1,21 @@
-extends SceneTree
+extends Node
 ## Headless test runner: finds every tests/**/test_*.gd, runs each test_*
 ## method on a fresh instance, and exits non-zero on any failure.
 ##
+## Runs as a scene (tests/test_runner.tscn) rather than a bare script so that
+## autoloads such as SignalBus exist, exactly like in the game.
 ## Run with scripts/test.sh (it also fails the run on any script error).
-## Optional filter: godot --headless --script res://tests/test_runner.gd -- <substring>
+## Optional filter: godot --headless res://tests/test_runner.tscn -- <substring>
 
 const TEST_ROOT := "res://tests"
 
 
-func _initialize() -> void:
+func _ready() -> void:
+	# Deferred so tests can add nodes to the (no longer busy) scene tree.
+	_run_all.call_deferred()
+
+
+func _run_all() -> void:
 	var filter: String = ""
 	var args: PackedStringArray = OS.get_cmdline_user_args()
 	if not args.is_empty():
@@ -40,7 +47,7 @@ func _initialize() -> void:
 					print("    " + failure)
 
 	print("\n%d passed, %d failed" % [passed, failed])
-	quit(1 if failed > 0 or passed == 0 else 0)
+	get_tree().quit(1 if failed > 0 or passed == 0 else 0)
 
 
 func _find_test_files(dir_path: String) -> PackedStringArray:

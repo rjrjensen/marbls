@@ -1,0 +1,33 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://board/board_hole.gd" id="1_script"]
+
+[sub_resource type="StandardMaterial3D" id="PitMaterial"]
+albedo_color = Color(0.13, 0.08, 0.04, 1)
+roughness = 1.0
+
+[sub_resource type="CylinderMesh" id="PitMesh"]
+material = SubResource("PitMaterial")
+top_radius = 0.34
+bottom_radius = 0.34
+height = 0.02
+radial_segments = 24
+rings = 1
+
+[sub_resource type="TorusMesh" id="RingMesh"]
+inner_radius = 0.34
+outer_radius = 0.44
+rings = 24
+ring_segments = 8
+
+[node name="Hole" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="Pit" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.002, 0)
+mesh = SubResource("PitMesh")
+
+[node name="Ring" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.3, 0, 0, 0, 1, 0, 0.01, 0)
+visible = false
+mesh = SubResource("RingMesh")

@@ -16,7 +16,7 @@ if grep -qE "SCRIPT ERROR|Parse Error|ERROR: Failed to load script" <<<"$import_
 	exit 1
 fi
 
-test_log=$("$GODOT" --headless --script res://tests/test_runner.gd -- "$@" 2>&1)
+test_log=$("$GODOT" --headless res://tests/test_runner.tscn -- "$@" 2>&1)
 status=$?
 echo "$test_log"
 if grep -qE "SCRIPT ERROR|Parse Error|ERROR: Failed to load script" <<<"$test_log"; then

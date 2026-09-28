@@ -1,0 +1,25 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://board/hole.tscn" id="1_hole"]
+
+[node name="StartingBlock" type="Node3D"]
+
+[node name="Slot0" parent="." instance=ExtResource("1_hole")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2.8284)
+role = 2
+number = 0
+
+[node name="Slot1" parent="." instance=ExtResource("1_hole")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -4.2426)
+role = 2
+number = 1
+
+[node name="Slot2" parent="." instance=ExtResource("1_hole")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -5.6569)
+role = 2
+number = 2
+
+[node name="Slot3" parent="." instance=ExtResource("1_hole")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -7.0711)
+role = 2
+number = 3
