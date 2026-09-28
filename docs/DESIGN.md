@@ -531,7 +531,9 @@ Each milestone ends with something playable or testable.
 3. ✅ **Special rules.** Four (backwards), Seven split, Jack swap, Fast Track, Bull's Eye, and teams.
    - Picking a split Seven or a swap takes one tap per marble, and the second tap is skipped when only one choice is left.
    - Teams: partners sit opposite. Once a partner is home, their cards move their teammates' marbles.
-4. **AI opponents.** Evaluators, `AIProfile`, the presets, and a headless AI-vs-AI simulation for balance.
+4. ✅ **AI opponents.** Evaluators, `AIProfile`, the presets, and a headless AI-vs-AI simulation for balance (`scripts/simulate.sh`).
+   - New games default to you (Red) against the computer. The Grandmaster's look-ahead counts the cards still in its own deck.
+   - First balance run (80 four-player games, seats rotated) — win rates: Kelsey 36%, Turtle 34%, Grandmaster 23%, Rookie 19%, Jordan 12%. Jordan kills the most and wins the least, as advertised.
 5. **Big moments.**
    - `MomentDetector`, `CinematicDirector`, and the Highlight tier.
    - The first two cinematics: Shark Attack and Strike!

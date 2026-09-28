@@ -1,0 +1,16 @@
+; Balanced but sloppy. Good for kids and first-timers.
+[gd_resource type="Resource" script_class="AIProfile" format=3]
+
+[ext_resource type="Script" path="res://players/ai/ai_profile.gd" id="1_profile"]
+
+[resource]
+script = ExtResource("1_profile")
+display_name = "Rookie"
+aggression = 0.5
+goal_focus = 0.5
+caution = 0.3
+foresight = 0.0
+memory = 0.2
+teamwork = 0.5
+gambler = 0.5
+sloppiness = 0.8

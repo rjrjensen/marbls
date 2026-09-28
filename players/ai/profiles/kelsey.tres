@@ -1,0 +1,16 @@
+; Evil and smart: strategic kills that still move toward the goal.
+[gd_resource type="Resource" script_class="AIProfile" format=3]
+
+[ext_resource type="Script" path="res://players/ai/ai_profile.gd" id="1_profile"]
+
+[resource]
+script = ExtResource("1_profile")
+display_name = "Kelsey"
+aggression = 0.6
+goal_focus = 0.9
+caution = 0.85
+foresight = 0.5
+memory = 0.6
+teamwork = 0.7
+gambler = 0.6
+sloppiness = 0.05

@@ -1,0 +1,16 @@
+; Stays safe, avoids risk, and wins slowly.
+[gd_resource type="Resource" script_class="AIProfile" format=3]
+
+[ext_resource type="Script" path="res://players/ai/ai_profile.gd" id="1_profile"]
+
+[resource]
+script = ExtResource("1_profile")
+display_name = "The Turtle"
+aggression = 0.2
+goal_focus = 0.3
+caution = 1.0
+foresight = 0.0
+memory = 0.5
+teamwork = 0.9
+gambler = 0.1
+sloppiness = 0.05
