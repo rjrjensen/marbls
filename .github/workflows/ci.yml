@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  test:
+    name: Headless tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Godot
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/godot
+          key: godot-${{ hashFiles('scripts/install_godot.sh') }}
+
+      - name: Install Godot
+        run: echo "GODOT=$(scripts/install_godot.sh)" >> "$GITHUB_ENV"
+
+      - name: Run tests
+        run: scripts/test.sh
