@@ -528,7 +528,9 @@ Each milestone ends with something playable or testable.
    - A 3D board built from `Arm`/`Hole`/`Marble` scenes, with the tilted `BoardCamera`, tap-to-move, and Guided and Standard assist levels.
    - Placeholder art, and the quick-hit kill effect.
    - Namecheap → Cloudflare DNS, and the first web deploy to marbls.co so the family can try it.
-3. **Special rules.** Four (backwards), Seven split, Jack swap, Fast Track, Bull's Eye, and teams.
+3. ✅ **Special rules.** Four (backwards), Seven split, Jack swap, Fast Track, Bull's Eye, and teams.
+   - Picking a split Seven or a swap takes one tap per marble, and the second tap is skipped when only one choice is left.
+   - Teams: partners sit opposite. Once a partner is home, their cards move their teammates' marbles.
 4. **AI opponents.** Evaluators, `AIProfile`, the presets, and a headless AI-vs-AI simulation for balance.
 5. **Big moments.**
    - `MomentDetector`, `CinematicDirector`, and the Highlight tier.

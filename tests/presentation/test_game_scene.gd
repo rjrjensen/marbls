@@ -6,16 +6,24 @@ const GAME_SCENE := preload("res://game/game.tscn")
 
 
 func test_the_board_always_matches_the_game_state() -> void:
+	_play_and_check(false)
+
+
+func test_the_board_matches_in_a_team_game_too() -> void:
+	_play_and_check(true)
+
+
+func _play_and_check(teams: bool) -> void:
 	var tree := Engine.get_main_loop() as SceneTree
 	var game := GAME_SCENE.instantiate() as GameController
 	game.animate = false
 	tree.root.add_child(game)
-	game.new_game(4, 21)
+	game.new_game(4, 21, teams)
 
 	var board := game.get_node("Board") as BoardView
 	var driver := RandomNumberGenerator.new()
 	driver.seed = 3
-	for i: int in 400:
+	for i: int in 600:
 		if game.state().phase == GameState.Phase.GAME_OVER:
 			break
 		if game.state().phase == GameState.Phase.AWAITING_DRAW:

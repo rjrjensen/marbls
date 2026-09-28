@@ -15,6 +15,8 @@ var current_seat: int = 0
 var current_card: Card = null
 var turn_number: int = 0
 var winners: Array[int] = []
+## Seats that have all their marbles home, in the order they finished.
+var finished_seats: Array[int] = []
 
 
 func _init(p_topology: BoardTopology) -> void:
@@ -89,6 +91,7 @@ func to_dict() -> Dictionary:
 		"current_card": current_card.to_dict() if current_card != null else null,
 		"turn_number": turn_number,
 		"winners": winners.duplicate(),
+		"finished_seats": finished_seats.duplicate(),
 	}
 
 
@@ -105,4 +108,18 @@ static func from_dict(data: Dictionary) -> GameState:
 	var winner_data: Array = data["winners"]
 	for seat: Variant in winner_data:
 		state.winners.append(int(seat))
+	var finished_data: Array = data.get("finished_seats", [])
+	for seat: Variant in finished_data:
+		state.finished_seats.append(int(seat))
 	return state
+
+
+## A copy whose marbles can be moved freely (decks are shared), for looking
+## ahead, e.g. the second half of a split Seven.
+func copy_for_simulation() -> GameState:
+	var copy := GameState.new(topology)
+	for p: PlayerState in players:
+		copy.players.append(p.copy_for_simulation())
+	copy.phase = phase
+	copy.current_seat = current_seat
+	return copy

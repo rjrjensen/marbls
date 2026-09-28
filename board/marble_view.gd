@@ -10,7 +10,7 @@ const REST_HEIGHT := 0.24
 
 ## Which marble this is. Null for ghosts.
 var ref: MarbleRef = null
-## Ghosts only: the index of the legal move this ghost stands for.
+## Ghosts only: the index of the choice this ghost stands for.
 var move_index: int = -1
 
 var _material := StandardMaterial3D.new()
