@@ -8,9 +8,9 @@ extends Resource
 
 @export var marbles_per_player: int = 4
 @export var jokers_per_deck: int = 2
-## README: "If a card can start a marble, the start space must be empty."
-## When false, starting kills an opponent sitting on your Starting Exit.
-@export var starting_exit_must_be_empty: bool = true
+## Decided (family feedback): starting a marble kills an opponent sitting on
+## your Starting Exit. Set true for the stricter "start space must be empty".
+@export var starting_exit_must_be_empty: bool = false
 ## Open question: does a play-again card with no legal move still let you
 ## draw again? Assumed yes.
 @export var play_again_without_move: bool = true
@@ -25,9 +25,9 @@ extends Resource
 ## A Main Track marble that reaches a Fast Track corner with one step left
 ## may drop into the Bull's Eye instead.
 @export var bulls_eye_enabled: bool = true
-## Open question: does a marble *swapped* onto a corner get a Fast Track
-## chance? Assumed no: it didn't land there with a move.
-@export var swap_grants_fast_track: bool = false
+## Decided: any movement that lands a marble on a Fast Track corner, a Jack
+## swap included, puts it on the Fast Track.
+@export var swap_grants_fast_track: bool = true
 ## Team number for each seat, e.g. [0, 1, 0, 1] for partners sitting
 ## opposite at a 4-player table. Empty means everyone plays for themselves.
 @export var team_of_seat: PackedInt32Array = PackedInt32Array()
@@ -132,7 +132,7 @@ static func from_dict(data: Dictionary) -> RuleSet:
 	rules.jokers_cut_high = bool(data["jokers_cut_high"])
 	rules.fast_track_enabled = bool(data.get("fast_track_enabled", true))
 	rules.bulls_eye_enabled = bool(data.get("bulls_eye_enabled", true))
-	rules.swap_grants_fast_track = bool(data.get("swap_grants_fast_track", false))
+	rules.swap_grants_fast_track = bool(data.get("swap_grants_fast_track", true))
 	var teams: Array = data.get("team_of_seat", [])
 	for team: Variant in teams:
 		rules.team_of_seat.append(int(team))

@@ -18,6 +18,7 @@ var _base_color := Color.WHITE
 var _pulse: Tween = null
 
 @onready var _mesh: MeshInstance3D = $Mesh
+@onready var _label: Label3D = $Label
 
 
 func _ready() -> void:
@@ -35,6 +36,12 @@ func setup(color: Color, is_ghost: bool) -> void:
 		_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		_material.albedo_color = Color(color.lightened(0.35), 0.6)
 		set_glow(true)
+
+
+## Text floating above a ghost, e.g. how many spaces the move uses.
+func set_label(text: String) -> void:
+	_label.text = text
+	_label.visible = text != ""
 
 
 ## Makes the marble glow and pulse to show it can be tapped.

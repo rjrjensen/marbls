@@ -25,6 +25,9 @@ var _ai_players: Dictionary[int, AIPlayer] = {}
 var _generation: int = 0
 var _ai_pending: bool = false
 var _running_ai: bool = false
+## Seats that have cut in the current round of the starting ceremony.
+var _cut_round: Array[int] = []
+var _cutting: bool = false
 
 @onready var _board: BoardView = $Board
 @onready var _camera: BoardCamera = $BoardCamera
@@ -38,6 +41,7 @@ func _ready() -> void:
 			new_game(seat_count, randi(), teams, vs_computer)
 	)
 	_board.ghost_tapped.connect(_on_ghost_tapped)
+	_hud.back_pressed.connect(_on_back_pressed)
 	_board.marble_tapped.connect(_on_marble_tapped)
 	new_game(default_seat_count, randi(), false, default_vs_computer)
 
@@ -48,6 +52,9 @@ func new_game(seat_count: int, seed_value: int, teams: bool = false, vs_computer
 	_generation += 1
 	_queue.clear()
 	_busy = false
+	_cut_round.clear()
+	_cutting = false
+	_hud.cut_panel().visible = false
 	_ai_pending = false
 	var rules := RuleSet.new()
 	if teams and seat_count >= 4 and seat_count % 2 == 0:
@@ -125,7 +132,23 @@ func _play_queue() -> void:
 func _present(event: MatchEvent) -> void:
 	var seat_name: String = _seat_name(event.seat) if event.seat >= 0 else ""
 	match event.kind:
+		MatchEvent.Kind.CARD_CUT:
+			if not _cutting:
+				_cutting = true
+				_hud.cut_panel().begin()
+			elif _cut_round.has(event.seat):
+				_cut_round.clear()
+				_hud.cut_panel().show_tie()
+				await _pause(0.8)
+			_cut_round.append(event.seat)
+			_hud.cut_panel().show_cut(_seat_name(event.seat), SeatColors.color(event.seat), event.card)
+			await _pause(0.7)
 		MatchEvent.Kind.TURN_STARTED:
+			if _cutting:
+				_cutting = false
+				_hud.cut_panel().show_winner(_seat_name(event.seat))
+				await _pause(1.6)
+				_hud.cut_panel().visible = false
 			_hud.show_turn(_turn_title(event.seat), SeatColors.color(event.seat))
 			_hud.show_deck_count(state().player(event.seat).deck.draw_pile.size())
 			if _single_human_seat() < 0:
@@ -133,7 +156,7 @@ func _present(event: MatchEvent) -> void:
 		MatchEvent.Kind.DECK_RESHUFFLED:
 			_hud.show_message("Out of cards: reshuffled the deck")
 		MatchEvent.Kind.CARD_DRAWN:
-			_hud.show_card(event.card)
+			await _hud.flip_card(event.card, animate)
 			_hud.show_deck_count(state().player(event.seat).deck.draw_pile.size())
 			_hud.show_message("")
 		MatchEvent.Kind.NO_LEGAL_MOVE:
@@ -153,10 +176,16 @@ func _present(event: MatchEvent) -> void:
 			var names: PackedStringArray = []
 			for winner: int in event.winners:
 				names.append(_seat_name(winner))
+			var colors: Array[Color] = []
+			for winner: int in event.winners:
+				colors.append(SeatColors.color(winner))
+			var human_won: bool = _single_human_seat() < 0 or event.winners.has(_single_human_seat())
 			if event.winners.has(_single_human_seat()):
 				_hud.show_game_over("You win!" if event.winners.size() == 1 else "Your team wins!")
 			else:
 				_hud.show_game_over("%s win%s!" % [" & ".join(names), "" if names.size() > 1 else "s"])
+			if human_won and animate:
+				_hud.celebrate(colors)
 		MatchEvent.Kind.INTENT_REJECTED:
 			_hud.show_message(event.reason)
 
@@ -169,6 +198,7 @@ func _ready_for_input() -> void:
 		return
 	match state().phase:
 		GameState.Phase.AWAITING_DRAW:
+			_hud.set_back_visible(false)
 			_hud.set_draw_enabled(true)
 		GameState.Phase.AWAITING_MOVE:
 			_chooser.reset(legal_moves())
@@ -176,14 +206,41 @@ func _ready_for_input() -> void:
 
 
 func _show_choices() -> void:
+	var card: Card = state().current_card
+	var rank: Card.Rank = card.rank if card != null else Card.Rank.ACE
+	_hud.set_back_visible(_chooser.is_focused() and _has_multi_marble_moves())
+	if _chooser.needs_marble_first():
+		_choices = []
+		_board.show_selectable_marbles(_chooser.first_marbles())
+		if rank == Card.Rank.SEVEN:
+			_hud.show_message("Seven: tap the marble to move first (all 7, or part of it)")
+		else:
+			_hud.show_message("Tap one of your glowing marbles")
+		return
 	_choices = _chooser.choices()
 	_board.show_choices(_choices)
 	if _chooser.depth() > 0:
-		_hud.show_message("Now the second marble: tap where it goes")
-	elif state().current_card != null and state().current_card.rank == Card.Rank.SEVEN:
-		_hud.show_message("Move one marble 7, or tap a ghost to split the 7 between two")
+		_hud.show_message("Now move another marble the rest of the 7")
+	elif rank == Card.Rank.SEVEN and _chooser.is_focused():
+		_hud.show_message("Numbers show spaces used: 7 moves this marble all the way")
+	elif rank == Card.Rank.JACK and _chooser.is_focused():
+		_hud.show_message("Move 1, or tap \"swap\" to trade places")
 	else:
 		_hud.show_message("Tap a glowing ghost marble to move")
+
+
+func _has_multi_marble_moves() -> bool:
+	for move: Move in legal_moves():
+		if move.steps.size() > 1:
+			return true
+	return false
+
+
+func _on_back_pressed() -> void:
+	if _busy or state().phase != GameState.Phase.AWAITING_MOVE:
+		return
+	_chooser.reset(legal_moves())
+	_show_choices()
 
 
 func _on_ghost_tapped(choice_index: int) -> void:
@@ -200,8 +257,8 @@ func _on_marble_tapped(ref: MarbleRef) -> void:
 	if _busy or state().phase != GameState.Phase.AWAITING_MOVE:
 		return
 	# Tapping a marble shows just its moves (and starts a split over).
-	_chooser.focus_marble(ref, state().spot_of(ref).is_starting_block())
-	_show_choices()
+	if _chooser.focus_marble(ref, state().spot_of(ref).is_starting_block()):
+		_show_choices()
 
 
 func _announce_landing(event: MatchEvent) -> void:

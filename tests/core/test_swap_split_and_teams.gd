@@ -17,6 +17,18 @@ func test_jack_swaps_with_track_and_bulls_eye_marbles_only() -> void:
 	assert_eq(sorted(swaps), sorted(["seat0/m0<->seat1/m0", "seat0/m0<->seat2/m0"] as Array[String]))
 
 
+func test_a_swap_onto_a_corner_puts_the_marble_on_the_fast_track() -> void:
+	var game := _match_with_top_cards([Card.Rank.JACK])
+	game.state.player(0).marbles[0] = Spot.track(10)
+	game.state.player(1).marbles[0] = Spot.track(33)
+	game.submit(MatchIntent.draw_card(0))
+	for index: int in game.legal_moves().size():
+		if game.legal_moves()[index].kind == Move.Kind.SWAP:
+			game.submit(MatchIntent.choose_move(0, index))
+			break
+	assert_true(game.state.player(0).fast_track_ready[0])
+
+
 func test_a_swap_trades_places() -> void:
 	var game := _match_with_top_cards([Card.Rank.JACK])
 	game.state.player(0).marbles[0] = Spot.track(10)

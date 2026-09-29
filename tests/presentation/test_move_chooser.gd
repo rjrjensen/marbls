@@ -61,7 +61,7 @@ func test_focusing_a_starting_block_marble_offers_the_start() -> void:
 	var moves: Array[Move] = generator.legal_moves(state, 0, Card.new(Card.Rank.SIX))
 	var chooser := MoveChooser.new()
 	chooser.reset(moves)
-	chooser.focus_marble(MarbleRef.new(0, 3), true)
+	assert_true(chooser.focus_marble(MarbleRef.new(0, 3), true))
 	var choices: Array[MoveChoice] = chooser.choices()
 	assert_eq(choices.size(), 1)
 	assert_true(choices[0].to.equals(Spot.track(0)))
@@ -72,3 +72,45 @@ func _find(choices: Array[MoveChoice], ref: MarbleRef, to: Spot) -> MoveChoice:
 		if choice.marble.equals(ref) and choice.to.equals(to):
 			return choice
 	return null
+
+
+func test_a_seven_asks_for_a_marble_first_and_labels_spaces_used() -> void:
+	state.player(0).marbles[0] = Spot.track(10)
+	state.player(0).marbles[1] = Spot.track(40)
+	var moves: Array[Move] = generator.legal_moves(state, 0, Card.new(Card.Rank.SEVEN))
+	var chooser := MoveChooser.new()
+	chooser.reset(moves)
+	assert_true(chooser.needs_marble_first())
+	assert_eq(chooser.first_marbles().size(), 2)
+	assert_true(chooser.focus_marble(MarbleRef.new(0, 0), false))
+	assert_false(chooser.needs_marble_first())
+	var labels: Array[String] = []
+	for choice: MoveChoice in chooser.choices():
+		labels.append(choice.label)
+	labels.sort()
+	assert_eq(labels, ["1", "2", "3", "4", "5", "6", "7"] as Array[String])
+
+
+func test_a_marble_that_cannot_move_is_not_focused() -> void:
+	state.player(0).marbles[0] = Spot.track(10)
+	var moves: Array[Move] = generator.legal_moves(state, 0, Card.new(Card.Rank.TWO))
+	var chooser := MoveChooser.new()
+	chooser.reset(moves)
+	assert_false(chooser.focus_marble(MarbleRef.new(1, 0), false), "Blue's marble isn't mine to move")
+	assert_false(chooser.is_focused())
+
+
+func test_a_jack_labels_swaps() -> void:
+	state.player(0).marbles[0] = Spot.track(10)
+	state.player(0).marbles[1] = Spot.track(40)
+	state.player(1).marbles[0] = Spot.track(30)
+	var moves: Array[Move] = generator.legal_moves(state, 0, Card.new(Card.Rank.JACK))
+	var chooser := MoveChooser.new()
+	chooser.reset(moves)
+	assert_true(chooser.needs_marble_first())
+	chooser.focus_marble(MarbleRef.new(0, 0), false)
+	var labels: Array[String] = []
+	for choice: MoveChoice in chooser.choices():
+		labels.append(choice.label)
+	labels.sort()
+	assert_eq(labels, ["1", "swap"] as Array[String])

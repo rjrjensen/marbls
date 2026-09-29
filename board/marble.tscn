@@ -23,4 +23,15 @@ input_ray_pickable = true
 [node name="Shape" type="CollisionShape3D" parent="Area"]
 shape = SubResource("TapShape")
 
+[node name="Label" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.62, 0)
+visible = false
+pixel_size = 0.006
+billboard = 1
+no_depth_test = true
+modulate = Color(1, 1, 1, 1)
+outline_modulate = Color(0.08, 0.05, 0.02, 1)
+font_size = 64
+outline_size = 18
+
 [connection signal="input_event" from="Area" to="." method="_on_area_input_event"]

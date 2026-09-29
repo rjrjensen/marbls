@@ -4,11 +4,14 @@ extends RefCounted
 
 var marble: MarbleRef
 var to: Spot
+## Shown on the ghost: spaces used ("3"), or "out", "swap", "exit".
+var label: String
 
 
-func _init(p_marble: MarbleRef, p_to: Spot) -> void:
+func _init(p_marble: MarbleRef, p_to: Spot, p_label: String = "") -> void:
 	marble = p_marble
 	to = p_to
+	label = p_label
 
 
 func matches(step: MarbleStep) -> bool:
