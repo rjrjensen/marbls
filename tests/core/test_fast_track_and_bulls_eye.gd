@@ -1,5 +1,5 @@
 extends RulesTestCase
-## Fast Track and Bull's Eye, as decided in docs/DESIGN.md.
+## Fast Track and Bull's Eye, as described in docs/RULES.md.
 
 
 # --- Fast Track -------------------------------------------------------------

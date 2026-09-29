@@ -1,6 +1,6 @@
 class_name RulesTestCase
 extends TestCase
-## Shared setup for the special-rule tests (see docs/DESIGN.md).
+## Shared setup for the special-rule tests (see docs/RULES.md).
 ## Classic 4-player board: seat 0 exits at 0, its Home Base entrance is 54,
 ## the Fast Track corners are 5, 19, 33 and 47, and 47 is seat 0's own color.
 
