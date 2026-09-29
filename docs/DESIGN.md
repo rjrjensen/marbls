@@ -1,6 +1,6 @@
 # Marbles — Design & Implementation Plan
 
-This is the working map for building the digital version of Marbles. The rules themselves live in the [README](../README.md), which now also contains Kelsey's original written instructions. This doc covers:
+This is the working map for building the digital version of Marbles. The rules themselves live in [RULES.md](RULES.md); how the code works is explained in [TECH_NOTES.md](TECH_NOTES.md). This doc covers:
 
 - The tech choice and architecture
 - How the game scales to different player counts
@@ -8,7 +8,7 @@ This is the working map for building the digital version of Marbles. The rules t
 - Big moments: kill cinematics and celebrations
 - AI personalities
 - Online play, chat and voice
-- Rule decisions and the questions still open
+- Rule ideas still under discussion
 - Hosting on **marbls.co**, costs, and getting ready to sell cosmetics
 - The order to build things in
 
@@ -237,7 +237,7 @@ On a phone, moving never requires drag precision. Dragging is supported on large
 - **What a Classic-mode mistake costs** is a `RuleSet` option:
   - *Soft:* rejected, try again. This is the default.
   - *Strict:* a miscount forfeits the card.
-  - *Case Family Rules* (a fun option; the README says they're born cheaters): the miscount is **allowed**, and until the next card is drawn any opponent can tap **Challenge!** A correct challenge sends the cheating marble back; a wrong challenge costs the challenger. This fits online play well, needs a little extra event plumbing, and is a very on-brand feature.
+  - *Case Family Rules* (a fun option; the family lore says they're born cheaters): the miscount is **allowed**, and until the next card is drawn any opponent can tap **Challenge!** A correct challenge sends the cheating marble back; a wrong challenge costs the challenger. This fits online play well, needs a little extra event plumbing, and is a very on-brand feature.
 
 ---
 
@@ -374,18 +374,9 @@ The alternative is an all-in-one game backend such as **Nakama**, which bundles 
 
 ---
 
-## 9. Rules: decisions and open questions
+## 9. Rules: ideas under discussion
 
-### Decided
-
-| Question | Decision |
-| --- | --- |
-| Leaving the Bull's Eye | **Jack, Queen or King.** (Kelsey's card table listed only Queen/King; that is superseded.) |
-| Fast Track use-it-or-lose-it | **The very next card.** If that card doesn't move the Fast Track marble, the chance is lost and it goes the long way. |
-| Deck composition | **52 cards + 2 Jokers per player.** |
-| Fast Track movement | A marble whose move **ends exactly on a Fast Track corner** can ride the Fast Track with its owner's **next card**. **Each point of that card is one decision:** hop to the next corner, or step off onto the Main Track. Once it steps off, the rest of the count goes along the Main Track. At its own color's corner it must step off toward Home Base. It can't land on or hop over its own marbles on the corners, so it has to step off before them. Landing on a teammate kills it, so you'd normally step off early. A move that ends on a corner again keeps the chance for the next card. |
-| Jack swap | Swap one of your marbles with any other color's marble on the **Main Track (including Fast Track corners and Starting Exits) or in the Bull's Eye**, but not one in a Starting Block or Home Base. **Swapping with a teammate is allowed** (it can be strategic). |
-| Seven split | Very flexible: **either or both halves can kill, and either or both can go into Home Base.** (Still true: split between exactly two marbles, all 7 used, at least one of your own marbles moves.) |
+**All decided rules live in [RULES.md](RULES.md)**, including every answer the family gave to the questions that used to be listed here, and the house-rule options (`RuleSet`). When a new rule question comes up, decide it, update RULES.md, and add a test in `tests/core/`.
 
 ### Idea: the Comeback Joker
 
@@ -394,26 +385,12 @@ After a player loses N games in a row, their deck gets an extra Joker until they
 - It's a `RuleSet` option (`comeback_joker_after_losses`, 0 = off) plus a `DeckRecipe` that can add cards.
 - Show it openly (a 🃏 badge by the player's name), so it reads as a friendly handicap, not a secret one.
 - **Decided: per game table for v1.** The streak counts consecutive losses at the current table, and it resets when the table ends.
-- A **lifetime** version, which follows a player across tables so a long losing run doesn't drive them away, is tracked as a story to evaluate later: [rjrjensen/Marbles#2](https://github.com/rjrjensen/Marbles/issues/2).
+- A **lifetime** version, which follows a player across tables so a long losing run doesn't drive them away, is tracked as a story to evaluate later: [rjrjensen/marbls#2](https://github.com/rjrjensen/marbls/issues/2).
 - Still open for v1:
   - Does it stack (a third Joker after 2N losses)?
   - Do games against AIs count toward the streak?
 
-### Also decided (September 2026)
-
-| Question | Decision |
-| --- | --- |
-| Cutting for first player | Joker beats Ace; tied players cut again. The cut is shown as a starting ceremony, not a silent coin flip. |
-| Landing on the Fast Track by other means | **Any** movement that ends on a corner puts the marble on the Fast Track, a Jack swap and a backward Four included. |
-| Home Base | Exact fit; no jumping your own marbles. |
-| Play-again with no legal move | You still draw again. |
-| Kills on a Starting Exit or in the Bull's Eye | Both allowed. |
-| Starting onto an opponent | An Ace, Six or Joker brings a marble out **and kills** an opponent sitting on your Starting Exit (family feedback; the README's "start space must be empty" is now the optional strict rule). |
-| A Four on the Fast Track | The marble simply backs off the corner onto the Main Track. |
-| Leaving the Bull's Eye | Only with a face card; a Four can't move it. |
-| Bull's Eye entry | Not from your own color's corner (the one right before your Home Base). |
-
-All of these have tests in `tests/core/`.
+Other rule ideas are stories: shorter games ([#10](https://github.com/rjrjensen/marbls/issues/10)), Doubles and Chaos modes ([#8](https://github.com/rjrjensen/marbls/issues/8)), and Classic-mode mistake rules ([#13](https://github.com/rjrjensen/marbls/issues/13)).
 
 ---
 
@@ -491,11 +468,14 @@ The server is a plain Docker image, so moving to Hetzner or elsewhere later is a
 | `play.marbls.co` | WebSocket game server (Fly.io) |
 | `marbls.co/t/<code>` | Table invite links. On phones, universal/app links open the installed app instead. |
 
-### Namecheap → Cloudflare (when we set up the first web deploy)
+### What's live today (September 2026)
 
-1. Create a free Cloudflare account and add `marbls.co`. Cloudflare shows two nameservers.
-2. In Namecheap: **Domain List → Manage** next to `marbls.co` → **Nameservers → Custom DNS**. Paste the two Cloudflare nameservers and save. The switch can take up to a day.
-3. Create a Cloudflare API token scoped to Pages and DNS for `marbls.co`, and save it as a GitHub Actions secret. CI then deploys the web game and manages the DNS records.
+- **Web game:** Cloudflare Pages project `marbls`, served at **marbls.co**, **www.marbls.co** and **marbls.pages.dev**.
+  - Merging to `master` deploys to production. Every PR gets its own preview URL, listed in the Actions run summary.
+  - The GitHub secret `CLOUDFLARE_API_TOKEN` (Cloudflare Pages: Edit) is all the deploy needs; the account is detected automatically.
+- **DNS:** the `marbls.co` zone at Cloudflare. Both names are proxied CNAMEs pointing to `marbls.pages.dev`.
+- **Registrar:** Namecheap. Only its nameservers setting matters now, and it points to Cloudflare.
+- **Known constraint:** the engine file is split to fit Cloudflare's 25 MB per-file limit. The options for removing the split are in [TECH_NOTES.md](TECH_NOTES.md#the-web-build-and-why-the-engine-file-is-split). Decision pending.
 
 ---
 
@@ -532,7 +512,7 @@ Each milestone ends with something playable or testable.
    - `Card`, `Deck`, `BoardTopology`, `GameState`, `MoveGenerator`, `MoveResolver`, `Match`, and `LocalMatchHost` (intents in, events out).
    - Basic movement, starting, kills, Home Base, and play-again.
    - Full unit tests, and seeded, serializable state. No UI yet.
-2. ✅ **Hot-seat prototype.** (Web deploy switches on once the Cloudflare secrets are set.)
+2. ✅ **Hot-seat prototype.** (Live at marbls.co.)
    - A 3D board built from `Arm`/`Hole`/`Marble` scenes, with the tilted `BoardCamera`, tap-to-move, and Guided and Standard assist levels.
    - Placeholder art, and the quick-hit kill effect.
    - Namecheap → Cloudflare DNS, and the first web deploy to marbls.co so the family can try it.
@@ -542,6 +522,10 @@ Each milestone ends with something playable or testable.
 4. ✅ **AI opponents.** Evaluators, `AIProfile`, the presets, and a headless AI-vs-AI simulation for balance (`scripts/simulate.sh`).
    - New games default to you (Red) against the computer. The Grandmaster's look-ahead counts the cards still in its own deck.
    - First balance run (80 four-player games, seats rotated) — win rates: Kelsey 36%, Turtle 34%, Grandmaster 23%, Rookie 19%, Jordan 12%. Jordan kills the most and wins the least, as advertised.
+- ✅ **Family feedback round 1** (after milestone 4): easier Seven and Jack picking, card flip, marble clicks, starting ceremony, win celebration, green pulsing Draw button, and new rules (details in [the retrospective](retros/2026-09-29.md)).
+
+**Next:** step 5 (big moments) or step 7 (online play). Ryan decides; see [the retrospective's open decisions](retros/2026-09-29.md#open-decisions).
+
 5. **Big moments.**
    - `MomentDetector`, `CinematicDirector`, and the Highlight tier.
    - The first two cinematics: Shark Attack and Strike!
@@ -557,7 +541,7 @@ Each milestone ends with something playable or testable.
    - The cosmetics store (§11)
    - Classic assist level with step-count
    - Case Family Rules
-   - Comeback Joker, per table, then evaluate lifetime ([rjrjensen/Marbles#2](https://github.com/rjrjensen/Marbles/issues/2))
+   - Comeback Joker, per table, then evaluate lifetime ([rjrjensen/marbls#2](https://github.com/rjrjensen/marbls/issues/2))
    - Async games
    - Voice chat
 

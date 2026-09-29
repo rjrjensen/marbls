@@ -1,5 +1,5 @@
 extends TestCase
-## Checks the numbering against the README's ASCII board (4 arms, 56 spaces).
+## Checks the numbering against the ASCII board in docs/RULES.md (4 arms, 56 spaces).
 
 
 func test_classic_board_has_56_track_spaces() -> void:

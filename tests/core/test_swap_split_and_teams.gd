@@ -1,5 +1,5 @@
 extends RulesTestCase
-## Jack swap, Seven split and teams, as decided in docs/DESIGN.md.
+## Jack swap, Seven split and teams, as described in docs/RULES.md.
 
 
 # --- Jack swap -----------------------------------------------------------------

@@ -3,8 +3,8 @@ extends Resource
 ## Every rule that could reasonably vary between tables.
 ##
 ## "Rules are subject to change, of course. Sometimes midgame!" Where the
-## README is ambiguous, add an option here instead of hard-coding a choice
-## (see docs/DESIGN.md §9 for the open questions).
+## rules are ambiguous, add an option here instead of hard-coding a choice
+## (the options and their defaults are listed in docs/RULES.md).
 
 @export var marbles_per_player: int = 4
 @export var jokers_per_deck: int = 2

@@ -1,5 +1,5 @@
 extends TestCase
-## Movement rules from the README. Classic 4-player board: seat N sits at arm
+## Movement rules from docs/RULES.md. Classic 4-player board: seat N sits at arm
 ## N, so seat 0 exits at track 0 and turns into Home Base after track 54.
 
 var rules := RuleSet.new()
