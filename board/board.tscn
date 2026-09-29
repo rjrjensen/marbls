@@ -5,6 +5,8 @@
 [ext_resource type="PackedScene" path="res://board/starting_block.tscn" id="3_block"]
 [ext_resource type="PackedScene" path="res://board/marble.tscn" id="4_marble"]
 [ext_resource type="PackedScene" path="res://board/hole.tscn" id="5_hole"]
+[ext_resource type="AudioStream" path="res://audio/marble_click.wav" id="6_click"]
+[ext_resource type="AudioStream" path="res://audio/kill_thud.wav" id="7_thud"]
 
 [sub_resource type="StandardMaterial3D" id="WoodMaterial"]
 albedo_color = Color(0.62, 0.42, 0.22, 1)
@@ -41,3 +43,11 @@ role = 3
 [node name="Marbles" type="Node3D" parent="."]
 
 [node name="Ghosts" type="Node3D" parent="."]
+
+[node name="HopSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("6_click")
+volume_db = -4.0
+max_polyphony = 4
+
+[node name="KillSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("7_thud")

@@ -86,6 +86,7 @@ func test_play_again_without_a_move_is_a_rule_option() -> void:
 	for allowed: bool in [true, false]:
 		var game := new_match()
 		game.rules.play_again_without_move = allowed
+		game.rules.starting_exit_must_be_empty = true
 		var me: PlayerState = game.state.player(0)
 		me.marbles[0] = Spot.home(3)
 		me.marbles[1] = Spot.home(2)

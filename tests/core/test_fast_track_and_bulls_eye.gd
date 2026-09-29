@@ -105,3 +105,20 @@ func test_only_jack_queen_or_king_leave_the_bulls_eye_for_the_own_corner() -> vo
 	assert_eq(destinations_of(moves_for(0, Card.Rank.ACE), MarbleRef.new(0, 0)), [] as Array[String])
 	for rank: Card.Rank in [Card.Rank.JACK, Card.Rank.QUEEN, Card.Rank.KING]:
 		assert_eq(destinations_of(moves_for(0, rank), MarbleRef.new(0, 0)), ["track:47"] as Array[String])
+
+
+func test_no_bulls_eye_from_the_corner_right_before_home() -> void:
+	# 47 is Red's own corner: arriving there with one step left just walks on.
+	place(0, 0, Spot.track(45))
+	assert_eq(destinations_of(moves_for(0, Card.Rank.THREE), MarbleRef.new(0, 0)), ["track:48"] as Array[String])
+
+
+func test_a_four_from_a_corner_just_backs_onto_the_main_track() -> void:
+	place(0, 0, Spot.track(19))
+	state.player(0).fast_track_ready[0] = true
+	assert_eq(destinations_of(moves_for(0, Card.Rank.FOUR), MarbleRef.new(0, 0)), ["track:15"] as Array[String])
+
+
+func test_a_marble_in_the_bulls_eye_ignores_a_four() -> void:
+	place(0, 0, Spot.bulls_eye())
+	assert_eq(destinations_of(moves_for(0, Card.Rank.FOUR), MarbleRef.new(0, 0)), [] as Array[String])

@@ -100,3 +100,10 @@ func test_jordan_kills_more_than_the_turtle() -> void:
 		jordan_kills += int(kills[0]) + int(kills[2])
 		turtle_kills += int(kills[1]) + int(kills[3])
 	assert_true(jordan_kills > turtle_kills, "Jordan %d vs Turtle %d" % [jordan_kills, turtle_kills])
+
+
+func test_sitting_on_an_opponents_starting_exit_is_dangerous() -> void:
+	place(0, 0, Spot.track(14))  # Blue's Starting Exit; Blue still has marbles to bring out
+	var exposed: float = BoardMetrics.danger(state, 0, rules)
+	place(0, 0, Spot.track(16))
+	assert_true(exposed > BoardMetrics.danger(state, 0, rules))

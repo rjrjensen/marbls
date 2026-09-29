@@ -35,6 +35,8 @@ var _radius: float = 10.0
 @onready var _pieces: Node3D = $Pieces
 @onready var _marble_layer: Node3D = $Marbles
 @onready var _ghost_layer: Node3D = $Ghosts
+@onready var _hop_sound: AudioStreamPlayer = $HopSound
+@onready var _kill_sound: AudioStreamPlayer = $KillSound
 
 
 ## Rebuilds everything for this game's board and seats.
@@ -152,7 +154,15 @@ func show_choices(choices: Array[MoveChoice]) -> void:
 		ghost.setup(SeatColors.color(choice.marble.seat), true)
 		ghost.move_index = index
 		ghost.global_position = rest_position(choice.marble, choice.to)
+		ghost.set_label(choice.label)
 		ghost.tapped.connect(_on_ghost_tapped)
+
+
+## Makes these marbles glow (no ghosts yet): "pick a marble first".
+func show_selectable_marbles(refs: Array[MarbleRef]) -> void:
+	clear_choices()
+	for ref: MarbleRef in refs:
+		marble_view(ref).set_glow(true)
 
 
 func clear_choices() -> void:
@@ -175,6 +185,7 @@ func play_step(step: MarbleStep, animate: bool) -> void:
 		var distance: float = view.global_position.distance_to(target)
 		var stretch: float = clampf(distance, 1.0, 5.0)
 		await _hop(view, target, HOP_SECONDS * sqrt(stretch), HOP_HEIGHT * stretch)
+		_play_click()
 
 
 ## Sends a killed marble flying back to its Starting Block.
@@ -184,10 +195,12 @@ func play_kill(victim: MarbleRef, state: GameState, animate: bool) -> void:
 	if not animate:
 		view.global_position = target
 		return
+	_kill_sound.play()
 	var pop := create_tween()
 	pop.tween_property(view, "scale", Vector3.ONE * 1.5, 0.08)
 	pop.tween_property(view, "scale", Vector3.ONE, 0.12)
 	await _hop(view, target, 0.6, 3.0)
+	_play_click()
 
 
 func _hop(view: MarbleView, target: Vector3, seconds: float, height: float) -> void:
@@ -199,6 +212,13 @@ func _hop(view: MarbleView, target: Vector3, seconds: float, height: float) -> v
 		0.0, 1.0, seconds
 	)
 	await tween.finished
+
+
+## Marble on wood, pitched a little differently each time so a run of hops
+## doesn't sound mechanical.
+func _play_click() -> void:
+	_hop_sound.pitch_scale = randf_range(0.9, 1.12)
+	_hop_sound.play()
 
 
 func _on_marble_tapped(view: MarbleView) -> void:

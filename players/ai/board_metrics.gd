@@ -10,6 +10,8 @@ const FORWARD_ODDS: Array[float] = [
 	4.0 / 54.0, 4.0 / 54.0, 4.0 / 54.0, 4.0 / 54.0, 4.0 / 54.0,
 ]
 const BACKWARD_FOUR_ODDS := 4.0 / 54.0
+## Ace, Six or Joker.
+const START_CARD_ODDS := 10.0 / 54.0
 
 
 ## 0 in the Starting Block, about the track length just before Home Base,
@@ -61,5 +63,10 @@ static func danger(state: GameState, seat: int, rules: RuleSet) -> float:
 					hit_chance += FORWARD_ODDS[behind]
 				if posmod(their.index - spot.index, length) == 4:
 					hit_chance += BACKWARD_FOUR_ODDS
+			# Sitting on their Starting Exit: any start card (A, 6, Joker) brings
+			# a marble out on top of ours.
+			var on_their_exit: bool = spot.index == state.topology.starting_exit(other.arm)
+			if on_their_exit and not rules.starting_exit_must_be_empty and other.first_marble_in_starting_block() >= 0:
+				hit_chance += START_CARD_ODDS
 		total += minf(hit_chance, 1.0) * progress(state, seat, spot)
 	return total

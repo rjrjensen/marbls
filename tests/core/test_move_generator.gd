@@ -39,13 +39,13 @@ func test_own_marble_on_the_exit_blocks_starting() -> void:
 	assert_eq(destinations(moves), ["track:1"] as Array[String], "only the forward move remains")
 
 
-func test_opponent_on_the_exit_blocks_starting_by_default() -> void:
+func test_opponent_on_the_exit_blocks_starting_under_the_strict_rule() -> void:
+	rules.starting_exit_must_be_empty = true
 	place(1, 0, Spot.track(0))
 	assert_eq(moves_for(0, Card.Rank.SIX).size(), 0)
 
 
-func test_starting_can_kill_when_the_rule_allows_it() -> void:
-	rules.starting_exit_must_be_empty = false
+func test_starting_kills_an_opponent_on_the_exit() -> void:
 	place(1, 0, Spot.track(0))
 	var moves := moves_for(0, Card.Rank.JOKER)
 	assert_eq(moves.size(), 1)

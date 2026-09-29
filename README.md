@@ -79,7 +79,7 @@ Once a player's turn is finished, the player to their left (clockwise around the
 This continues until someone meets the goal below.
 
 Notes
-* If a card can start a marble, the start space must be empty. Once the marble is moved, the turn for that card is over and another card must be drawn, beginning another turn.
+* If a card can start a marble, the start space can't hold one of your own marbles. If an opponent's marble is sitting on your start space, starting a marble kills it. Once the marble is moved, the turn for that card is over and another card must be drawn, beginning another turn.
 * A marble cannot land on another marble of the same color or surpass a marble of the same color on the board. The marble in front of it must be moved first.
 * If a marble lands on a marble of another color, that opposing marble is considered killed, murdered in cold blood even, and the body is removed from the board and placed back in the home row. (This graphic nature is derived from Kelsey's ruthlessness in past games. She enjoys murder.)
 * The fastest route for a marble into the finish lane is for the marble to start on the start space and for the player to draw a four, moving the marble close to the entrance of the lane.
