@@ -62,8 +62,12 @@ class HttpRangeFile(io.RawIOBase):
 
 def main() -> None:
     members = sys.argv[1:] or DEFAULT_MEMBERS
-    data_home = os.environ.get("XDG_DATA_HOME", os.path.expanduser("~/.local/share"))
-    dest = os.path.join(data_home, "godot", "export_templates", "%s.stable" % VERSION)
+    if sys.platform == "darwin":
+        templates_root = os.path.expanduser("~/Library/Application Support/Godot/export_templates")
+    else:
+        data_home = os.environ.get("XDG_DATA_HOME", os.path.expanduser("~/.local/share"))
+        templates_root = os.path.join(data_home, "godot", "export_templates")
+    dest = os.path.join(templates_root, "%s.stable" % VERSION)
     missing = [m for m in members if not os.path.exists(os.path.join(dest, m))]
     if not missing:
         print(dest)
