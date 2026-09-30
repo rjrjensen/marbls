@@ -139,6 +139,7 @@ Instead of moving 1, swap one of your marbles with **any other color's** marble:
 - **Which marbles can be swapped:** marbles on the Main Track (including Fast Track corners and Starting Exits) or in the Bull's Eye. **Teammates count**, and that can be strategic.
 - **Which can't:** marbles in a Starting Block or Home Base.
 - **No kills:** a swap isn't a kill.
+- **Or just move 1:** the Jack's plain 1-space move works like an Ace's, so it **kills** whatever it lands on. A marble one space behind an opponent's can choose to kill it or swap with it.
 - **Fast Track:** a marble swapped onto a Fast Track corner **is on the Fast Track**.
 
 ## Kills
@@ -162,12 +163,14 @@ The four inner corners of the Main Track form a shortcut around the board.
 ## Bull's Eye
 
 The center hole is a gamble.
-- **Getting in:** a marble on the Main Track that **arrives at a Fast Track corner with exactly one step left** may take that step into the Bull's Eye instead of continuing. A backward Four can do this too.
+- **Getting in:** a marble on the Main Track may step into the Bull's Eye when it has **exactly one step left** and is standing on a Fast Track corner. There are two ways to be on that corner:
+  - **Arriving:** the marble's move brought it to the corner with one step left to spare (for example a 5 that starts 4 spaces before a corner).
+  - **Sitting there:** the marble is already on the corner and draws a card that moves **one space** (Ace, Jack, Queen, King or Joker). It doesn't matter whether it has a Fast Track chance. With one, the Bull's Eye is one more choice next to hopping to the next corner or stepping off.
+  - A backward Four can go in too.
   - There's **no entry from your own color's corner** (the one right before your Home Base).
-  - A marble already riding the Fast Track can't drop in.
-  - A marble just sitting on a corner doesn't count as "arriving" there.
+  - A marble in the middle of riding the Fast Track (hopping several corners on one card) can't drop in partway.
 - **Getting out:** the **only** way out is a **Jack, Queen or King**. It moves the marble to your own color's Fast Track corner, and it continues toward home from there.
-- **Kills:** entering an occupied Bull's Eye kills the marble there.
+- **Kills:** entering an occupied Bull's Eye kills the marble there, however you got in (forward, backward, or from a corner with a one-space card).
 
 ## Home Base
 

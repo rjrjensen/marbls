@@ -138,3 +138,19 @@ func test_random_games_with_every_rule_and_teams_finish() -> void:
 			assert_eq(game.state.winners.size(), 2 if seat_count > 0 else 0)
 			for winner: int in game.state.winners:
 				assert_true(game.state.player(winner).is_finished())
+
+
+func test_a_jack_one_space_behind_an_opponent_can_kill_or_swap() -> void:
+	place(0, 0, Spot.track(10))
+	place(1, 0, Spot.track(11))
+	var kill_moves: int = 0
+	var swap_moves: int = 0
+	for move: Move in moves_for(0, Card.Rank.JACK):
+		if move.kind == Move.Kind.FORWARD and move.steps[0].to.equals(Spot.track(11)):
+			kill_moves += 1
+			assert_eq(move.kills().size(), 1)
+		if move.kind == Move.Kind.SWAP and move.steps[0].to.equals(Spot.track(11)):
+			swap_moves += 1
+			assert_eq(move.kills().size(), 0)
+	assert_eq(kill_moves, 1, "the plain 1-space move kills")
+	assert_eq(swap_moves, 1, "the swap is still offered")

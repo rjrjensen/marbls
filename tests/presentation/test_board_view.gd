@@ -72,3 +72,30 @@ func _collect_hole_positions(node: Node, out: Array[Vector3]) -> void:
 		if child is BoardHole:
 			out.append((child as BoardHole).global_position)
 		_collect_hole_positions(child, out)
+
+
+func test_ghosts_that_share_a_hole_are_spread_apart_so_both_can_be_tapped() -> void:
+	var board := build_board(4)
+	var target := Spot.track(11)
+	var choices: Array[MoveChoice] = [
+		MoveChoice.new(MarbleRef.new(0, 0), target, "1"),
+		MoveChoice.new(MarbleRef.new(0, 0), target, "swap", true),
+		MoveChoice.new(MarbleRef.new(0, 0), Spot.track(12), "2"),
+	]
+	board.show_choices(choices)
+	var ghosts: Array[Node] = board.get_node("Ghosts").get_children()
+	assert_eq(ghosts.size(), 3)
+	var first := ghosts[0] as Node3D
+	var second := ghosts[1] as Node3D
+	var alone := ghosts[2] as Node3D
+	assert_true(first.global_position.distance_to(second.global_position) > 0.3, "spread apart")
+	# Ghosts float above the hole, so compare on the ground (x, z).
+	var middle: Vector3 = (first.global_position + second.global_position) / 2.0
+	assert_true(_ground_distance(middle, board.track_hole(11).global_position) < 0.05, "centered on the hole")
+	var lone_hole: Vector3 = board.track_hole(12).global_position
+	assert_true(_ground_distance(alone.global_position, lone_hole) < 0.05, "a lone ghost stays put")
+	free_board(board)
+
+
+func _ground_distance(a: Vector3, b: Vector3) -> float:
+	return Vector2(a.x - b.x, a.z - b.z).length()

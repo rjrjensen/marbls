@@ -94,7 +94,7 @@ func test_ai_games_always_finish() -> void:
 func test_jordan_kills_more_than_the_turtle() -> void:
 	var jordan_kills: int = 0
 	var turtle_kills: int = 0
-	for seed_value: int in range(1, 7):
+	for seed_value: int in range(1, 25):
 		var result: Dictionary = AISimulation.play(4, seed_value, false, ["Jordan", "The Turtle", "Jordan", "The Turtle"])
 		var kills: Array = result["kills_by_seat"]
 		jordan_kills += int(kills[0]) + int(kills[2])

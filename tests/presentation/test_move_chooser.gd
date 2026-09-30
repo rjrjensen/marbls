@@ -114,3 +114,59 @@ func test_a_jack_labels_swaps() -> void:
 		labels.append(choice.label)
 	labels.sort()
 	assert_eq(labels, ["1", "swap"] as Array[String])
+
+
+func test_a_jack_behind_an_opponent_offers_the_kill_and_the_swap_separately() -> void:
+	state.player(0).marbles[0] = Spot.track(10)
+	state.player(1).marbles[0] = Spot.track(11)
+	var moves: Array[Move] = generator.legal_moves(state, 0, Card.new(Card.Rank.JACK))
+	var chooser := MoveChooser.new()
+	chooser.reset(moves)
+	chooser.focus_marble(MarbleRef.new(0, 0), false)
+	var labels: Array[String] = []
+	for choice: MoveChoice in chooser.choices():
+		labels.append(choice.label)
+	labels.sort()
+	assert_eq(labels, ["1", "swap"] as Array[String], "both ghosts, though they share a hole")
+
+
+func test_tapping_the_kill_plays_the_kill_and_tapping_the_swap_plays_the_swap() -> void:
+	state.player(0).marbles[0] = Spot.track(10)
+	state.player(1).marbles[0] = Spot.track(11)
+	var moves: Array[Move] = generator.legal_moves(state, 0, Card.new(Card.Rank.JACK))
+	var kill := MoveChooser.new()
+	kill.reset(moves)
+	kill.focus_marble(MarbleRef.new(0, 0), false)
+	var kill_index: int = kill.pick(_find_labeled(kill.choices(), "1"))
+	assert_true(kill_index >= 0)
+	assert_eq(moves[kill_index].kind, Move.Kind.FORWARD)
+	assert_eq(moves[kill_index].kills().size(), 1)
+
+	var swap := MoveChooser.new()
+	swap.reset(moves)
+	swap.focus_marble(MarbleRef.new(0, 0), false)
+	var swap_index: int = swap.pick(_find_labeled(swap.choices(), "swap"))
+	assert_true(swap_index >= 0)
+	assert_eq(moves[swap_index].kind, Move.Kind.SWAP)
+
+
+func test_a_jack_can_kill_or_swap_with_the_marble_in_the_bulls_eye() -> void:
+	state.player(0).marbles[0] = Spot.track(5)
+	state.player(2).marbles[0] = Spot.bulls_eye()
+	var moves: Array[Move] = generator.legal_moves(state, 0, Card.new(Card.Rank.JACK))
+	var chooser := MoveChooser.new()
+	chooser.reset(moves)
+	chooser.focus_marble(MarbleRef.new(0, 0), false)
+	var into_eye: Array[String] = []
+	for choice: MoveChoice in chooser.choices():
+		if choice.to.kind == Spot.Kind.BULLS_EYE:
+			into_eye.append(choice.label)
+	into_eye.sort()
+	assert_eq(into_eye, ["1", "swap"] as Array[String])
+
+
+func _find_labeled(choices: Array[MoveChoice], label: String) -> MoveChoice:
+	for choice: MoveChoice in choices:
+		if choice.label == label:
+			return choice
+	return null
