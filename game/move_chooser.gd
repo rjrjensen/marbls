@@ -86,9 +86,9 @@ func choices() -> Array[MoveChoice]:
 		var step: MarbleStep = steps[_depth]
 		var known: bool = false
 		for choice: MoveChoice in out:
-			known = known or choice.matches(step)
+			known = known or choice.matches(_moves[index], step)
 		if not known:
-			out.append(MoveChoice.new(step.marble, step.to, _label(_moves[index], step)))
+			out.append(MoveChoice.new(step.marble, step.to, _label(_moves[index], step), _moves[index].kind == Move.Kind.SWAP))
 	return out
 
 
@@ -97,7 +97,7 @@ func pick(choice: MoveChoice) -> int:
 	var remaining: Array[int] = []
 	for index: int in _candidates:
 		var steps: Array[MarbleStep] = _moves[index].steps
-		if steps.size() > _depth and choice.matches(steps[_depth]):
+		if steps.size() > _depth and choice.matches(_moves[index], steps[_depth]):
 			remaining.append(index)
 	if remaining.is_empty():
 		return -1

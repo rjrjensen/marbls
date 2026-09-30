@@ -65,14 +65,15 @@ func marble_steps(state: GameState, ref: MarbleRef, count: int, backward: bool) 
 	var arm: int = state.player(ref.seat).arm
 	var topology: BoardTopology = state.topology
 
-	# The plain walk. A Main Track marble that arrives on a corner with one
-	# step left may take that step into the Bull's Eye instead (except from its
-	# own color's corner, the one right before its Home Base).
+	# The plain walk. A Main Track marble standing on a corner with one step
+	# left (it arrived there, or it's sitting there and the card moves one
+	# space) may take that step into the Bull's Eye instead, except from its
+	# own color's corner, the one right before its Home Base.
 	var path: Array[Spot] = []
 	var current: Spot = from
 	var blocked: bool = false
 	for i: int in count:
-		if rules.bulls_eye_enabled and i == count - 1 and i > 0 and current.is_track() \
+		if rules.bulls_eye_enabled and i == count - 1 and current.is_track() \
 				and topology.is_fast_track_corner(current.index) \
 				and current.index != topology.own_fast_track_corner(arm):
 			var dive: Array[Spot] = path.duplicate()

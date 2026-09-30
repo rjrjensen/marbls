@@ -15,6 +15,8 @@ signal ghost_tapped(choice_index: int)
 const HUB_SIDE := 4.0
 const HOP_SECONDS := 0.13
 const HOP_HEIGHT := 0.45
+## Sideways distance between ghosts that would sit in the same hole.
+const SHARED_HOLE_SPREAD := 0.35
 
 @export var arm_scene: PackedScene
 @export var starting_block_scene: PackedScene
@@ -143,9 +145,18 @@ func sync_marbles(state: GameState) -> void:
 			marble_view(ref).global_position = rest_position(ref, p.marbles[i])
 
 
-## Makes each choice's marble glow and shows a ghost where it would go.
+## Makes each choice's marble glow and shows a ghost where it would go. Ghosts
+## that would share a hole (a Jack's kill and its swap) are spread sideways so
+## each can be tapped.
 func show_choices(choices: Array[MoveChoice]) -> void:
 	clear_choices()
+	var positions: Array[Vector3] = []
+	var sharing: Dictionary[Vector3, int] = {}
+	for choice: MoveChoice in choices:
+		var spot_position: Vector3 = rest_position(choice.marble, choice.to)
+		positions.append(spot_position)
+		sharing[spot_position] = sharing.get(spot_position, 0) + 1
+	var placed: Dictionary[Vector3, int] = {}
 	for index: int in choices.size():
 		var choice: MoveChoice = choices[index]
 		marble_view(choice.marble).set_glow(true)
@@ -153,7 +164,11 @@ func show_choices(choices: Array[MoveChoice]) -> void:
 		_ghost_layer.add_child(ghost)
 		ghost.setup(SeatColors.color(choice.marble.seat), true)
 		ghost.move_index = index
-		ghost.global_position = rest_position(choice.marble, choice.to)
+		var spot_position: Vector3 = positions[index]
+		var crowd: int = sharing[spot_position]
+		var slot: int = placed.get(spot_position, 0)
+		placed[spot_position] = slot + 1
+		ghost.global_position = spot_position + Vector3((slot - (crowd - 1) / 2.0) * SHARED_HOLE_SPREAD, 0.0, 0.0)
 		ghost.set_label(choice.label)
 		ghost.tapped.connect(_on_ghost_tapped)
 

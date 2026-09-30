@@ -38,7 +38,7 @@ func test_landing_on_a_corner_kills_but_hopping_past_does_not() -> void:
 		if move.steps[0].to.equals(Spot.track(33)):
 			assert_eq(move.kills().size(), 0, "hopped over the blue marble")
 	assert_eq(destinations_of(moves_for(0, Card.Rank.ACE), MarbleRef.new(0, 0)),
-			sorted(["track:19", "track:6"] as Array[String]))
+			sorted(["bulls-eye", "track:19", "track:6"] as Array[String]))
 
 
 func test_the_chance_is_granted_by_ending_on_a_corner_and_lost_after_the_next_card() -> void:
@@ -79,11 +79,6 @@ func test_arriving_at_a_corner_with_one_step_left_can_drop_into_the_bulls_eye() 
 			sorted(["bulls-eye", "track:6"] as Array[String]))
 
 
-func test_starting_on_a_corner_is_not_arriving() -> void:
-	place(0, 0, Spot.track(5))
-	assert_eq(destinations_of(moves_for(0, Card.Rank.ACE), MarbleRef.new(0, 0)), ["track:6"] as Array[String])
-
-
 func test_a_four_can_back_into_the_bulls_eye() -> void:
 	place(0, 0, Spot.track(8))
 	assert_eq(destinations_of(moves_for(0, Card.Rank.FOUR), MarbleRef.new(0, 0)),
@@ -94,6 +89,16 @@ func test_diving_into_an_occupied_bulls_eye_kills() -> void:
 	place(0, 0, Spot.track(1))
 	place(2, 0, Spot.bulls_eye())
 	for move: Move in moves_for(0, Card.Rank.FIVE):
+		if move.steps[0].to.kind == Spot.Kind.BULLS_EYE:
+			assert_eq(move.kills().size(), 1)
+			return
+	fail("no Bull's Eye move")
+
+
+func test_a_four_backing_into_an_occupied_bulls_eye_kills() -> void:
+	place(0, 0, Spot.track(8))
+	place(1, 2, Spot.bulls_eye())
+	for move: Move in moves_for(0, Card.Rank.FOUR):
 		if move.steps[0].to.kind == Spot.Kind.BULLS_EYE:
 			assert_eq(move.kills().size(), 1)
 			return

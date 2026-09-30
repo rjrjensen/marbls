@@ -19,7 +19,7 @@ cd build/web
 split -b "$PART_SIZE" -d -a 1 index.wasm index.wasm.part
 rm index.wasm
 parts=$(ls index.wasm.part* | wc -l)
-sed -i "s/__MARBLS_WASM_PARTS__/${parts}/" index.html
+sed -i.bak "s/__MARBLS_WASM_PARTS__/${parts}/" index.html && rm index.html.bak
 grep -q "Number(\"${parts}\")" index.html || { echo "wasm loader not found in index.html"; exit 1; }
 
 # Nothing may exceed Cloudflare's per-file limit.
