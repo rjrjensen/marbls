@@ -34,7 +34,7 @@ Only the decision that passed all three gates (hard to reverse, surprising, a re
 - **Piles live in the 3D table (Q1, A).** Each seat's draw and discard piles are real objects on the table beside the seat; tapping a pile is 3D picking. They inherit the camera tilt and rotation. Alternatives (all-2D HUD piles; hybrid with big 2D piles for you and small 3D piles for opponents) stay reachable as Variants on the flag page. Rejected as the default: the 2D HUD (has to chase projected positions, never feels on the table) and the hybrid (kept as a fallback if reading the 3D card at a tilt is too fiddly).
 - **Card faces are procedural (Q2, B).** One Card scene draws corner indices, suit pips in the standard layouts and simple J/Q/K/Joker art from a template, so there are no 54 image imports and no licensing. Rejected: an existing open/public-domain vector set (fast to look real but locks in someone else's style and licence terms) and a subagent-generated 54-file SVG set (uneven consistency).
 - **Active seat marker (Q3).** The active seat's nameplate is a steady lit state in its seat color (optionally larger, with a small static arrow). No halo around the Starting Block and no bouncing or pulsing on nameplates: the user rejected the halo, and the bounce ran at a different frequency than the card. While a computer thinks, the marble on its nameplate becomes a slow spinner (a highlight orbits it, about 2.8 s per turn in the prototype); only the one thinking seat animates. Nameplates are compact pills (marble + name, no reserved dots slot, no card counts) sitting tight to their piles so the board can be as large as possible.
-- **"Your turn, tap the pile" cue (Q5, C as answered, reduced by later feedback).** Final cue: only the top card of your draw pile lifts and gently bobs, with a glow in your marble color; the rest of the stack stays put. Keyboard accept (`ui_accept`) still draws. The second half of answer C (a pulse of your color across the table edge or seat halo) was dropped when the halo was rejected; see Open threads. Not shown for computer turns, and the cue stops the moment you tap.
+- **"Your turn, tap the pile" cue (Q5).** The question: with tap-to-draw replacing the pulsing green Draw button, how does the table say "your turn" without words? Options were (A) the top card of your draw pile gently rises and falls with a soft glow in your marble color, (B) a bouncing arrow or pointing hand above the pile, (C) A plus a faint pulse of your color across the table edge or seat halo. The answer was C, but the user later rejected the halo and asked for "just the top card" to float. **Final, confirmed by the user:** only the top card of your draw pile lifts and gently bobs, with a glow in your marble color; the rest of the stack stays put; no edge or halo pulse. Keyboard accept (`ui_accept`) still draws. Not shown for computer turns, and the cue stops the moment you tap. While a computer thinks, the marble on its nameplate is the spinner (see the active seat marker above).
 - **No top bar, message line, Draw button or bottom card panel (Q6, C, refined by Q8 and Q10).** The turn label, message line and the green Draw button are removed. New game moves to the game menu.
 - **Where words go (Q8).** The info orb (top left) is the helpful guide: hints, rules help, rejections and notes appear there. Hints can be turned off in settings (see Q11). Events are shown by animation rather than text.
 - **Orb and menu placement (Q10).** Info orb top left, game menu top right: two separate entities in two separate corners. Both must respect iOS safe-area insets.
@@ -62,7 +62,7 @@ Only the decision that passed all three gates (hard to reverse, surprising, a re
 - **Custom orb animation:** expanding the orb text caused a visible "text keeps refitting" bug in the first prototype. The rule: lay the message out once at its final width, animate only the shell (marble to squircle) with clipping on, then fade the text in; collapse in reverse. In Godot: size the Label up front, tween the Panel size with `clip_contents`, tween Label alpha afterwards.
 - **Nameplate sizing bug (found in v6):** anything that changes a nameplate's size (like the old dots) pushes it into its piles. Rule: nameplates are fixed-size (`custom_minimum_size`); the thinking marble animates in place.
 - **Hints counter lives in browser storage:** clearing site data resets it, and on a shared family phone it is per device, not per person, until accounts exist.
-- **Pip overlap:** in the prototype, the 9 and 10 cards' pips overlap (known, unfixed). Court-card and Joker art is intentionally simple and has not been designed.
+- **Pip overlap (9 and 10):** pips are the suit symbols printed in the middle of a card. The 9 and 10 have four rows of pips on each side, and the prototype spaces those rows about 14.7 units apart while each symbol is about 14 units tall, so neighbours touch or overlap (the 10's two center pips also squeeze between the side rows). It is an unfixed prototype flaw, taken from the drawing agent's report and the layout code rather than a screenshot of my own; the fix is smaller pips for 9 and 10. Court-card and Joker art is intentionally simple and has not been designed.
 - **Draw timing is an estimate.** The "halfway between" timing was computed against a roughly 1 s guess for the first version, which could not be recovered; the timings are constants in the prototype (`DRAW_LIFT_S`, `DRAW_FLIP_S`, `DRAW_FLASH_S`, `DRAW_HOLD_S`, `DRAW_LAND_S`) and should be tuned on the real build.
 
 ## Deferred
@@ -71,28 +71,30 @@ None. Q9 (card backs) was deferred until the user could see the three designs si
 
 ## Open threads
 
-- **Q5's second cue.** The answered option C included a pulse of your color across the table edge or seat halo. The later "no halo" and "float only the top card" feedback removed it from the prototype, but Q5 itself was not reopened. Treat the top-card lift plus glow as the cue and confirm the edge pulse is not wanted.
-- **Words for events.** Q8 settled that hints go to the info orb and events use animation. Not decided: exactly which messages the orb carries versus which are animation only (rejections, Bull's Eye and Fast Track notes, reshuffle notices, kills, "No move with that card"), and whether the orb auto-expands for important ones (rejected move, game over) or only pulses. The recommendation made during the interview was to reserve auto-expand for things that really need it.
+- **Words for events.** Q8 settled that hints go to the info orb and events use animation. Not decided: exactly which messages the orb carries versus which are animation only, and whether the orb auto-expands for important ones or only pulses. The recommendation made during the interview was to reserve auto-expand for things that really need it. The messages that exist today are: move hints (7-split, Jack swap), Bull's Eye and Fast Track notes, "play again", the reshuffle notice, "no move with that card" (a normal event when a drawn card cannot move any marble), and the reason text for a rejected action (`INTENT_REJECTED`, a safety net when the game turns down an action such as acting out of turn; it should rarely show for a person using the UI because only legal choices are offered).
+- **Family-friendly language.** The user asked to stop saying "kill" in the game and in the design. Candidate words: "bump" (Sorry!), "send home", "eliminate", "capture"; not decided. "Shuffle" stays for shuffling the deck. Tracked in the wording story (#23). Until it is decided, this doc and the stories describe it as "sending a marble home".
 - **Speech chips for your own move hint.** Early options put hints in a chip by your nameplate; the final answer puts the guide in the top-left orb. This reintroduces some eye travel between the orb and the board at the moment you most need the hint. Try it with family and reconsider if it hurts.
 - **Pile stack height.** The draw pile visibly shrinks as it is drawn; the numeric count was removed (each player reshuffles once all their cards are in the played pile, so the count is not needed). Whether the stack should stay a constant height is not decided.
 - **What counts as a "win" for the hints counter** on a team game, and whether a win by a teammate counts for the human, is not decided.
-- **Supabase story.** The request to record "move settings storage to Supabase" in the Supabase stories has not been done yet.
+- **Supabase accounts.** No story exists for Supabase accounts themselves (only planned in `CLAUDE.md`), so the settings sync story (#29) cannot start until one does.
 
-## Stories (one per piece; created after this doc, not yet filed)
+## Stories
 
-Per the Q12 answer and CLAUDE.md, each becomes a `Story: ...` GitHub issue linked from `docs/DESIGN.md`'s backlog. Those touching `GameController` and the HUD overlap, so the isolated pieces below should land first.
+One GitHub story per piece of work, filed in dependency order. **A story starts only when every prerequisite story is complete and its work is merged.** Each story links its prerequisites in its own description.
 
-Isolated, can run in parallel in separate worktrees:
-1. Settings object + feature flags (typed Resources, autoload, `flag_changed` on the SignalBus, `user://` persistence, flag page).
-2. Procedural card faces (A to 10, J, Q, K, Joker; fix 9/10 pip overlap).
-3. Card backs C, A, B in seat colors.
-4. Info orb scene (top left) with the expand/collapse animation rule above.
-5. Game menu scene (top right): New game, hints toggle, feature flag page entry.
-6. Nameplate scene (compact pill, steady lit state, thinking-marble spinner shader).
+| # | Story | Prerequisites |
+| --- | --- | --- |
+| [#19](https://github.com/rjrjensen/marbls/issues/19) | Settings and feature flags (live variants and flag page) | none |
+| [#20](https://github.com/rjrjensen/marbls/issues/20) | Procedural card faces (A to 10, J, Q, K, Joker) | none |
+| [#21](https://github.com/rjrjensen/marbls/issues/21) | Info orb (top-left hint guide) | none |
+| [#22](https://github.com/rjrjensen/marbls/issues/22) | Seat nameplates (steady lit turn marker and thinking marble) | none |
+| [#23](https://github.com/rjrjensen/marbls/issues/23) | Family-friendly wording for sending a marble home (replace "kill") | none (needs a decision on the word) |
+| [#24](https://github.com/rjrjensen/marbls/issues/24) | Card backs in each seat's marble colour (three designs) | #19, #20 |
+| [#25](https://github.com/rjrjensen/marbls/issues/25) | Game menu (top-right hamburger) | #19 |
+| [#26](https://github.com/rjrjensen/marbls/issues/26) | 3D draw and discard piles with tap-to-draw | #19, #20, #24 |
+| [#27](https://github.com/rjrjensen/marbls/issues/27) | Hints-off prompt after 10 wins | #19, #21 |
+| [#28](https://github.com/rjrjensen/marbls/issues/28) | Draw animation and current-card flash | #26 |
+| [#29](https://github.com/rjrjensen/marbls/issues/29) | Supabase settings sync (hints and flags per profile) | #19, #27, and Supabase accounts (no story yet) |
+| [#30](https://github.com/rjrjensen/marbls/issues/30) | Remove the top bar, message line, Draw button and card panel | #21, #22, #23, #25, #26, #28 |
 
-Touches shared game code (sequence after the above):
-7. Pile interface and 3D piles (neat draw stack, messy discard pile, tap or `ui_accept` to draw, top-card lift cue).
-8. Draw animation and current-card flash (about 0.75 s motion plus a 1.1 s hold, auto-land).
-9. Remove the top bar, message line, Draw button and bottom card panel; route hints and notes to the orb and the thinking state to the nameplate marble.
-10. Hints-off prompt after 10 wins ("Yes" / "Keep them on a little longer"; the latter resets the counter).
-11. Supabase story: sync settings and the hints counter per profile.
+No-prerequisite stories (#19 to #23) can run in parallel in separate worktrees. #23 can start designing only once the word is chosen.
