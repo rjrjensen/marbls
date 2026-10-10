@@ -68,6 +68,7 @@ func build(state: GameState) -> void:
 		var outward: Vector3 = (arm_direction(p.arm) + arm_direction(p.arm + 1)).normalized()
 		block.transform = Transform3D(Basis(Vector3.UP, -atan2(outward.x, -outward.z)), corner)
 		_pieces.add_child(block)
+		(block as StartingBlock).set_color(color)
 		_block_holes[p.arm] = [null, null, null, null]
 		for hole: BoardHole in _holes_in(block):
 			_block_holes[p.arm][hole.number] = hole
