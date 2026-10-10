@@ -558,3 +558,17 @@ Each milestone ends with something playable or testable.
 | Usage metrics, retrospectives, in-game feedback | [rjrjensen/marbls#12](https://github.com/rjrjensen/marbls/issues/12) |
 | Classic assist level and mistake rules | [rjrjensen/marbls#13](https://github.com/rjrjensen/marbls/issues/13) |
 | AI partners that play as a team | [rjrjensen/marbls#14](https://github.com/rjrjensen/marbls/issues/14) |
+| Settings and feature flags (live variants and flag page) | [rjrjensen/marbls#19](https://github.com/rjrjensen/marbls/issues/19) |
+| Procedural card faces | [rjrjensen/marbls#20](https://github.com/rjrjensen/marbls/issues/20) |
+| Info orb (top-left hint guide) | [rjrjensen/marbls#21](https://github.com/rjrjensen/marbls/issues/21) |
+| Seat nameplates (steady lit turn marker and thinking marble) | [rjrjensen/marbls#22](https://github.com/rjrjensen/marbls/issues/22) |
+| Family-friendly wording for sending a marble home | [rjrjensen/marbls#23](https://github.com/rjrjensen/marbls/issues/23) |
+| Card backs in each seat's marble colour (needs #19, #20) | [rjrjensen/marbls#24](https://github.com/rjrjensen/marbls/issues/24) |
+| Game menu (needs #19) | [rjrjensen/marbls#25](https://github.com/rjrjensen/marbls/issues/25) |
+| 3D draw and discard piles with tap-to-draw (needs #19, #20, #24) | [rjrjensen/marbls#26](https://github.com/rjrjensen/marbls/issues/26) |
+| Hints-off prompt after 10 wins (needs #19, #21) | [rjrjensen/marbls#27](https://github.com/rjrjensen/marbls/issues/27) |
+| Draw animation and current-card flash (needs #26) | [rjrjensen/marbls#28](https://github.com/rjrjensen/marbls/issues/28) |
+| Supabase settings sync (needs #19, #27, accounts) | [rjrjensen/marbls#29](https://github.com/rjrjensen/marbls/issues/29) |
+| Remove the top bar, message line, Draw button and card panel (needs #21, #22, #23, #25, #26, #28) | [rjrjensen/marbls#30](https://github.com/rjrjensen/marbls/issues/30) |
+
+The last twelve rows are the visual polish pass; see [visual-polish-design.md](visual-polish-design.md) for the design and the order they must be built in.
