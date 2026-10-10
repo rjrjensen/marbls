@@ -4,6 +4,7 @@
 [ext_resource type="Script" path="res://ui/celebration.gd" id="2_celebration"]
 [ext_resource type="PackedScene" path="res://ui/celebration_card.tscn" id="3_card"]
 [ext_resource type="Script" path="res://ui/cut_panel.gd" id="4_cut"]
+[ext_resource type="PackedScene" path="res://ui/cards/card_face.tscn" id="5_face"]
 
 [sub_resource type="StyleBoxFlat" id="BarStyle"]
 bg_color = Color(0.1, 0.07, 0.04, 0.82)
@@ -12,16 +13,7 @@ content_margin_top = 14.0
 content_margin_right = 18.0
 content_margin_bottom = 14.0
 
-[sub_resource type="StyleBoxFlat" id="CardStyle"]
-bg_color = Color(0.98, 0.96, 0.9, 1)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
-content_margin_left = 8.0
-content_margin_top = 6.0
-content_margin_right = 8.0
-content_margin_bottom = 6.0
+[sub_resource type="StyleBoxEmpty" id="CardStyle"]
 
 [sub_resource type="StyleBoxFlat" id="CardBackStyle"]
 bg_color = Color(0.13, 0.27, 0.6, 1)
@@ -145,28 +137,13 @@ theme_override_constants/separation = 28
 
 [node name="Card" type="PanelContainer" parent="Root/BottomBar/Row"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(120, 160)
+custom_minimum_size = Vector2(120, 168)
 layout_mode = 2
 theme_override_styles/panel = SubResource("CardStyle")
 
-[node name="Face" type="VBoxContainer" parent="Root/BottomBar/Row/Card"]
-layout_mode = 2
-alignment = 1
-
-[node name="CardRank" type="Label" parent="Root/BottomBar/Row/Card/Face"]
+[node name="CardFace" parent="Root/BottomBar/Row/Card" instance=ExtResource("5_face")]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.1, 0.1, 0.1, 1)
-theme_override_font_sizes/font_size = 60
-text = "?"
-horizontal_alignment = 1
-
-[node name="CardSuit" type="Label" parent="Root/BottomBar/Row/Card/Face"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.1, 0.1, 0.1, 1)
-theme_override_font_sizes/font_size = 20
-horizontal_alignment = 1
 
 [node name="Actions" type="VBoxContainer" parent="Root/BottomBar/Row"]
 layout_mode = 2

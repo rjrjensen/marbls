@@ -8,7 +8,6 @@ signal draw_pressed
 signal back_pressed
 signal new_game_requested(seat_count: int, teams: bool, vs_computer: bool)
 
-const SUIT_NAMES: PackedStringArray = ["Clubs", "Diamonds", "Hearts", "Spades", ""]
 const MIN_SEATS := 2
 const MAX_SEATS := 8
 const FLIP_SECONDS := 0.14
@@ -24,8 +23,7 @@ var _card_face_style: StyleBox
 @onready var _turn_label: Label = %TurnLabel
 @onready var _message_label: Label = %MessageLabel
 @onready var _card: PanelContainer = %Card
-@onready var _card_rank: Label = %CardRank
-@onready var _card_suit: Label = %CardSuit
+@onready var _card_face: CardFace = %CardFace
 @onready var _draw_button: Button = %DrawButton
 @onready var _back_button: Button = %BackButton
 @onready var _deck_label: Label = %DeckLabel
@@ -82,30 +80,24 @@ func flip_card(card: Card, animate: bool) -> void:
 		show_card(card)
 		return
 	_card.pivot_offset = _card.size / 2.0
-	_card.add_theme_stylebox_override("panel", card_back_style)
-	_card_rank.text = ""
-	_card_suit.text = ""
+	show_card(null)
 	var shrink := create_tween().set_trans(Tween.TRANS_SINE)
 	shrink.tween_property(_card, "scale", Vector2(0.0, 1.12), FLIP_SECONDS)
 	await shrink.finished
-	_card.add_theme_stylebox_override("panel", _card_face_style)
 	show_card(card)
 	var grow := create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	grow.tween_property(_card, "scale", Vector2.ONE, FLIP_SECONDS * 1.4)
 	await grow.finished
 
 
+## Shows [param card] face up, or the card back when there is no card yet.
 func show_card(card: Card) -> void:
+	_card_face.visible = card != null
 	if card == null:
-		_card_rank.text = "?"
-		_card_suit.text = ""
+		_card.add_theme_stylebox_override("panel", card_back_style)
 		return
-	_card_rank.text = Card.RANK_NAMES[card.rank]
-	_card_suit.text = SUIT_NAMES[card.suit]
-	var red: bool = card.suit == Card.Suit.HEARTS or card.suit == Card.Suit.DIAMONDS
-	var ink := Color("#c1121f") if red else Color("#1b1b1b")
-	_card_rank.add_theme_color_override("font_color", ink)
-	_card_suit.add_theme_color_override("font_color", ink)
+	_card.add_theme_stylebox_override("panel", _card_face_style)
+	_card_face.show_card(card)
 
 
 func set_back_visible(visible_now: bool) -> void:
