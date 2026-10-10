@@ -33,10 +33,10 @@ func set_ring_color(color: Color) -> void:
 func set_fill_color(color: Color) -> void:
 	var pit_material := StandardMaterial3D.new()
 	pit_material.albedo_color = color
-	pit_material.roughness = 0.3
+	pit_material.roughness = 0.75
 	_pit.material_override = pit_material
 	var inset_material := StandardMaterial3D.new()
 	inset_material.albedo_color = color.lerp(Color.WHITE, INSET_WHITENESS)
-	inset_material.roughness = 0.3
+	inset_material.roughness = 0.75
 	_inset.material_override = inset_material
 	_inset.visible = true

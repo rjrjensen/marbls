@@ -49,12 +49,15 @@ Plain code with no scenes or graphics, so it's fast to test and can run on a ser
 
 ## How the board is built
 
-The board is made entirely of simple 3D shapes; no 3D modeling tool was used.
+The board is made entirely of simple 3D shapes; no 3D modeling tool was used. It copies the look of the real family boards and the final visual polish prototype.
 
 | Piece | How it's made |
 | --- | --- |
-| The board | A flat **cylinder** (a disc) with a wood-colored material (`board/board.tscn`) |
-| A hole | A thin dark cylinder slightly above the wood, plus an optional colored **torus** (ring) for the special holes (`board/hole.tscn`) |
+| The board | A rounded-rectangle **slab** that hugs the holes, with a darker, slightly bigger slab under it as the rim. Both are `CSGPolygon3D` nodes: a flat outline pushed down into a solid (`board/board.tscn`). The outline is worked out in `BoardView`, because the board's size depends on the number of players. |
+| The wood | A small **shader** (`board/wood.gdshader`): a diagonal light-to-dark gradient plus faint grain lines. A shader is a tiny program the graphics card runs for every pixel. |
+| A hole | A thin brown cylinder slightly above the wood (`board/hole.tscn`). Home Base, Starting Exits and your own Fast Track corner are **filled** with the seat colour; Starting Block holes get a coloured **torus** (ring). |
+| A Starting Block groove | A flat plane under the four block holes, with a shader that draws a pill shape in the seat colour (`board/groove.gdshader`) |
+| The Bull's Eye | `board/bulls_eye.tscn`: stacked flat discs, red, cream and red, like a target |
 | One arm | `board/arm.tscn`: 18 holes at fixed positions. The outer loop section, the Fast Track corner, and the Home Base lane. |
 | A Starting Block | `board/starting_block.tscn`: 4 holes in a diagonal line |
 | A marble | A **sphere** with a glossy material: low roughness plus a rim light (`board/marble.tscn`) |
@@ -69,7 +72,7 @@ The board is made entirely of simple 3D shapes; no 3D modeling tool was used.
 **The board never tilts; the camera does** (`board/board_camera.gd`).
 - **The view:** the camera sits 62° above the table, looking down at the center through a *perspective* lens. Things nearer the camera look bigger, so your side of the board is the largest.
 - **The pivot:** the camera is attached to an invisible pivot at the center of the board. Turning the pivot swings the camera around the table, which is how your side (or, in pass-and-play, the current player's side) ends up at the bottom.
-- **Fitting the screen:** the distance adjusts so the whole board fits the screen in portrait or landscape.
+- **Fitting the screen:** the camera comes as close as it can while all four corners of the board stay inside the open area between the HUD's top and bottom bars, then shifts its aim so the board sits in the middle. A rectangular board is wider from some sides, so it refits while it turns. The HUD reports the open area with its `board_area_changed` signal.
 
 ## How marbles move (animation)
 

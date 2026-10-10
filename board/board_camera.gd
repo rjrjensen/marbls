@@ -11,6 +11,8 @@ extends Node3D
 
 ## The board's outline on the table, including its rim.
 var _footprint := Rect2(-10.0, -10.0, 20.0, 20.0)
+## The part of the screen the board must fit in; empty means the whole screen.
+var _screen_area := Rect2()
 
 @onready var _camera: Camera3D = $Camera
 
@@ -24,6 +26,13 @@ func _ready() -> void:
 ## table, [param footprint]) stays on screen.
 func frame(footprint: Rect2) -> void:
 	_footprint = footprint
+	_place_camera()
+
+
+## Keeps the board inside [param area] of the screen (say, between the HUD's
+## bars). An empty rectangle means the whole screen.
+func fit_inside(area: Rect2) -> void:
+	_screen_area = area
 	_place_camera()
 
 
@@ -57,32 +66,38 @@ func _turn_to(angle: float) -> void:
 ## then nudges the aim so the board sits in the middle.
 func _place_camera() -> void:
 	var size: Vector2 = get_viewport().get_visible_rect().size
+	var area: Rect2 = _screen_area if _screen_area.has_area() else Rect2(Vector2.ZERO, size)
+	area = area.grow(-screen_margin)
 	var portrait: bool = size.y > size.x
 	_camera.keep_aspect = Camera3D.KEEP_WIDTH if portrait else Camera3D.KEEP_HEIGHT
 	_camera.fov = field_of_view
 	var focus := Vector3(_footprint.get_center().x, 0.0, _footprint.get_center().y)
-	var reach: float = _footprint.size.length()
-	var distance: float = reach
-	for attempt: int in 4:
-		var near: float = 0.1
-		var far: float = reach * 6.0
-		for step: int in 24:
-			distance = (near + far) / 2.0
-			_aim(focus, distance)
-			if _board_on_screen(size):
-				far = distance
-			else:
-				near = distance
-		distance = far
-		_aim(focus, distance)
-		var bounds: Rect2 = _board_on_screen_bounds()
-		var off_center: float = bounds.get_center().y - size.y / 2.0
-		if absf(off_center) < 2.0:
+	var distance: float = _fit_distance(focus, area)
+	for attempt: int in 8:
+		var off_center: float = _board_on_screen_bounds().get_center().y - area.get_center().y
+		if absf(off_center) < 1.0:
 			break
-		# Move the aim toward the viewer (down the screen) or away from them.
+		# Aim nearer the viewer to move the board up the screen, farther to move it down.
 		var toward_viewer: Vector3 = global_transform.basis.z
 		toward_viewer.y = 0.0
 		focus += toward_viewer.normalized() * off_center / size.y * distance * 0.5
+		distance = _fit_distance(focus, area)
+
+
+## The closest distance (aiming at [param focus]) at which the board fits in
+## [param area]. Leaves the camera there.
+func _fit_distance(focus: Vector3, area: Rect2) -> float:
+	var near: float = 0.1
+	var far: float = _footprint.size.length() * 6.0
+	for step: int in 24:
+		var distance: float = (near + far) / 2.0
+		_aim(focus, distance)
+		if area.encloses(_board_on_screen_bounds()):
+			far = distance
+		else:
+			near = distance
+	_aim(focus, far)
+	return far
 
 
 func _aim(focus: Vector3, distance: float) -> void:
@@ -90,10 +105,6 @@ func _aim(focus: Vector3, distance: float) -> void:
 	var eye: Vector3 = Vector3(0.0, sin(tilt), cos(tilt)) * distance
 	var local_focus: Vector3 = global_transform.affine_inverse() * focus
 	_camera.transform = Transform3D(Basis(), local_focus + eye).looking_at(local_focus, Vector3.UP)
-
-
-func _board_on_screen(size: Vector2) -> bool:
-	return Rect2(Vector2.ZERO, size).grow(-screen_margin).encloses(_board_on_screen_bounds())
 
 
 func _board_on_screen_bounds() -> Rect2:

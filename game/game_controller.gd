@@ -43,6 +43,8 @@ func _ready() -> void:
 	_board.ghost_tapped.connect(_on_ghost_tapped)
 	_hud.back_pressed.connect(_on_back_pressed)
 	_board.marble_tapped.connect(_on_marble_tapped)
+	_hud.board_area_changed.connect(_camera.fit_inside)
+	_camera.fit_inside(_hud.board_area())
 	new_game(default_seat_count, randi(), false, default_vs_computer)
 
 
