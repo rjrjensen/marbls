@@ -31,5 +31,6 @@ script = ExtResource("3_camera")
 
 [node name="Camera" type="Camera3D" parent="BoardCamera"]
 current = true
+near = 1.0
 
 [node name="Hud" parent="." instance=ExtResource("4_hud")]

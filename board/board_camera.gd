@@ -63,24 +63,30 @@ func _turn_to(angle: float) -> void:
 
 
 ## Finds the closest distance at which every corner of the board is on screen,
-## then nudges the aim so the board sits in the middle.
+## then slides the aim so the board sits in the middle.
 func _place_camera() -> void:
 	var size: Vector2 = get_viewport().get_visible_rect().size
 	var area: Rect2 = _screen_area if _screen_area.has_area() else Rect2(Vector2.ZERO, size)
 	area = area.grow(-screen_margin)
+	# A minimised window has nothing to fit into; wait for the next resize.
+	if not area.has_area():
+		return
 	var portrait: bool = size.y > size.x
 	_camera.keep_aspect = Camera3D.KEEP_WIDTH if portrait else Camera3D.KEEP_HEIGHT
 	_camera.fov = field_of_view
 	var focus := Vector3(_footprint.get_center().x, 0.0, _footprint.get_center().y)
 	var distance: float = _fit_distance(focus, area)
 	for attempt: int in 8:
-		var off_center: float = _board_on_screen_bounds().get_center().y - area.get_center().y
-		if absf(off_center) < 1.0:
+		var off_center: Vector2 = _board_on_screen_bounds().get_center() - area.get_center()
+		if off_center.length() < 1.0:
 			break
-		# Aim nearer the viewer to move the board up the screen, farther to move it down.
+		# Slide the aim along the table: right to move the board left on
+		# screen, toward the viewer to move it up.
+		var world_per_pixel: float = 2.0 * tan(deg_to_rad(field_of_view) / 2.0) * distance / (size.x if portrait else size.y)
+		var right: Vector3 = global_transform.basis.x
 		var toward_viewer: Vector3 = global_transform.basis.z
 		toward_viewer.y = 0.0
-		focus += toward_viewer.normalized() * off_center / size.y * distance * 0.5
+		focus += (right.normalized() * off_center.x + toward_viewer.normalized() * off_center.y) * world_per_pixel * 0.8
 		distance = _fit_distance(focus, area)
 
 
