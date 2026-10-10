@@ -73,9 +73,9 @@ func build(state: GameState) -> void:
 			_block_holes[p.arm][hole.number] = hole
 			hole.set_ring_color(color)
 		for slot: int in 4:
-			(_home_holes[p.arm][slot] as BoardHole).set_ring_color(color)
-		_track_holes[_topology.starting_exit(p.arm)].set_ring_color(color)
-		_track_holes[_topology.own_fast_track_corner(p.arm)].set_ring_color(color.darkened(0.25))
+			(_home_holes[p.arm][slot] as BoardHole).set_fill_color(color)
+		_track_holes[_topology.starting_exit(p.arm)].set_fill_color(color)
+		_track_holes[_topology.own_fast_track_corner(p.arm)].set_fill_color(color)
 
 	_radius = 0.0
 	for hole: BoardHole in _holes_in(_pieces):

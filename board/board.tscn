@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" path="res://board/arm.tscn" id="2_arm"]
 [ext_resource type="PackedScene" path="res://board/starting_block.tscn" id="3_block"]
 [ext_resource type="PackedScene" path="res://board/marble.tscn" id="4_marble"]
-[ext_resource type="PackedScene" path="res://board/hole.tscn" id="5_hole"]
+[ext_resource type="PackedScene" path="res://board/bulls_eye.tscn" id="5_bulls_eye"]
 [ext_resource type="AudioStream" path="res://audio/marble_click.wav" id="6_click"]
 [ext_resource type="AudioStream" path="res://audio/kill_thud.wav" id="7_thud"]
 
@@ -34,9 +34,7 @@ marble_scene = ExtResource("4_marble")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
 mesh = SubResource("BaseMesh")
 
-[node name="BullsEye" parent="." instance=ExtResource("5_hole")]
-transform = Transform3D(1.3, 0, 0, 0, 1, 0, 0, 0, 1.3, 0, 0, 0)
-role = 3
+[node name="BullsEye" parent="." instance=ExtResource("5_bulls_eye")]
 
 [node name="Pieces" type="Node3D" parent="."]
 
