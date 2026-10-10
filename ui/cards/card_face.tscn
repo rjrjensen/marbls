@@ -1,0 +1,269 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://ui/cards/card_face.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://ui/cards/suits/spades.svg" id="2_spades"]
+[ext_resource type="Texture2D" path="res://ui/cards/art/court_crown.svg" id="3_crown"]
+[ext_resource type="Texture2D" path="res://ui/cards/art/joker_crown.svg" id="4_joker"]
+
+[sub_resource type="StyleBoxFlat" id="FaceStyle"]
+bg_color = Color(0.98, 0.96, 0.9, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0, 0, 0, 0.27)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+anti_aliasing_size = 1.5
+
+[sub_resource type="StyleBoxFlat" id="CourtFrameStyle"]
+resource_local_to_scene = true
+bg_color = Color(0.914, 0.863, 0.706, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.106, 0.106, 0.106, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="FontVariation" id="BoldFont"]
+variation_embolden = 0.6
+
+[sub_resource type="LabelSettings" id="IndexRankSettings"]
+resource_local_to_scene = true
+font = SubResource("BoldFont")
+font_size = 60
+font_color = Color(0.106, 0.106, 0.106, 1)
+
+[sub_resource type="LabelSettings" id="CourtLetterSettings"]
+resource_local_to_scene = true
+font = SubResource("BoldFont")
+font_size = 80
+font_color = Color(0.106, 0.106, 0.106, 1)
+
+[sub_resource type="LabelSettings" id="JokerWordSettings"]
+font = SubResource("BoldFont")
+font_size = 36
+font_color = Color(0.353, 0.165, 0.541, 1)
+
+[node name="CardFace" type="Control"]
+texture_filter = 5
+custom_minimum_size = Vector2(50, 70)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 250.0
+offset_bottom = 350.0
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="Art" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 0
+offset_right = 250.0
+offset_bottom = 350.0
+mouse_filter = 2
+
+[node name="Background" type="Panel" parent="Art"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("FaceStyle")
+
+[node name="TopIndex" type="Control" parent="Art"]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 7.5
+offset_top = 15.0
+offset_right = 56.25
+offset_bottom = 117.5
+pivot_offset = Vector2(24.375, 51.25)
+mouse_filter = 2
+
+[node name="TopRank" type="Label" parent="Art/TopIndex"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 0
+offset_left = -6.0
+offset_top = -12.0
+offset_right = 54.75
+offset_bottom = 60.0
+text = "A"
+label_settings = SubResource("IndexRankSettings")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TopSuit" type="TextureRect" parent="Art/TopIndex"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 0
+offset_left = 2.675
+offset_top = 58.3
+offset_right = 46.075
+offset_bottom = 101.7
+mouse_filter = 2
+texture = ExtResource("2_spades")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="BottomIndex" type="Control" parent="Art"]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 193.75
+offset_top = 232.5
+offset_right = 242.5
+offset_bottom = 335.0
+rotation = 3.14159
+pivot_offset = Vector2(24.375, 51.25)
+mouse_filter = 2
+
+[node name="BottomRank" type="Label" parent="Art/BottomIndex"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 0
+offset_left = -6.0
+offset_top = -12.0
+offset_right = 54.75
+offset_bottom = 60.0
+text = "A"
+label_settings = SubResource("IndexRankSettings")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BottomSuit" type="TextureRect" parent="Art/BottomIndex"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 0
+offset_left = 2.675
+offset_top = 58.3
+offset_right = 46.075
+offset_bottom = 101.7
+mouse_filter = 2
+texture = ExtResource("2_spades")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Pips" type="Control" parent="Art"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="PipTemplate" type="TextureRect" parent="Art/Pips"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 0
+offset_right = 70.0
+offset_bottom = 70.0
+mouse_filter = 2
+texture = ExtResource("2_spades")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Court" type="Control" parent="Art"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Frame" type="Panel" parent="Art/Court"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 0
+offset_left = 70.0
+offset_top = 70.0
+offset_right = 180.0
+offset_bottom = 280.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("CourtFrameStyle")
+
+[node name="Crown" type="TextureRect" parent="Art/Court"]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 82.5
+offset_top = 100.0
+offset_right = 167.5
+offset_bottom = 155.0
+mouse_filter = 2
+texture = ExtResource("3_crown")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Letter" type="Label" parent="Art/Court"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 0
+offset_left = 70.0
+offset_top = 150.0
+offset_right = 180.0
+offset_bottom = 235.0
+text = "K"
+label_settings = SubResource("CourtLetterSettings")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Suit" type="TextureRect" parent="Art/Court"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 0
+offset_left = 107.5
+offset_top = 235.0
+offset_right = 142.5
+offset_bottom = 270.0
+mouse_filter = 2
+texture = ExtResource("2_spades")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Joker" type="Control" parent="Art"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Crown" type="TextureRect" parent="Art/Joker"]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 30.0
+offset_top = 100.0
+offset_right = 220.0
+offset_bottom = 225.0
+mouse_filter = 2
+texture = ExtResource("4_joker")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Word" type="Label" parent="Art/Joker"]
+layout_mode = 1
+anchors_preset = 0
+offset_top = 245.0
+offset_right = 250.0
+offset_bottom = 295.0
+text = "JOKER"
+label_settings = SubResource("JokerWordSettings")
+horizontal_alignment = 1
+vertical_alignment = 1

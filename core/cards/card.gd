@@ -26,6 +26,11 @@ func is_joker() -> bool:
 	return rank == Rank.JOKER
 
 
+## Hearts and Diamonds are printed in red; the Joker is neither red nor black.
+func is_red() -> bool:
+	return suit == Suit.HEARTS or suit == Suit.DIAMONDS
+
+
 func is_face_card() -> bool:
 	return rank == Rank.JACK or rank == Rank.QUEEN or rank == Rank.KING
 
