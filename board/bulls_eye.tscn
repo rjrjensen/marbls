@@ -1,0 +1,65 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://board/hole.tscn" id="1_hole"]
+
+[sub_resource type="StandardMaterial3D" id="PitMaterial"]
+albedo_color = Color(0.24, 0.15, 0.07, 1)
+roughness = 1.0
+
+[sub_resource type="CylinderMesh" id="PitMesh"]
+material = SubResource("PitMaterial")
+top_radius = 0.85
+bottom_radius = 0.85
+height = 0.02
+radial_segments = 48
+rings = 1
+
+[sub_resource type="StandardMaterial3D" id="RedMaterial"]
+albedo_color = Color(0.84, 0.16, 0.16, 1)
+roughness = 0.35
+
+[sub_resource type="StandardMaterial3D" id="CreamMaterial"]
+albedo_color = Color(0.95, 0.93, 0.86, 1)
+roughness = 0.35
+
+[sub_resource type="CylinderMesh" id="OuterRedMesh"]
+material = SubResource("RedMaterial")
+top_radius = 0.72
+bottom_radius = 0.72
+height = 0.002
+radial_segments = 48
+rings = 1
+
+[sub_resource type="CylinderMesh" id="CreamMesh"]
+material = SubResource("CreamMaterial")
+top_radius = 0.54
+bottom_radius = 0.54
+height = 0.002
+radial_segments = 48
+rings = 1
+
+[sub_resource type="CylinderMesh" id="InnerRedMesh"]
+material = SubResource("RedMaterial")
+top_radius = 0.36
+bottom_radius = 0.36
+height = 0.002
+radial_segments = 48
+rings = 1
+
+[node name="BullsEye" instance=ExtResource("1_hole")]
+role = 3
+
+[node name="Pit" parent="." index="0"]
+mesh = SubResource("PitMesh")
+
+[node name="OuterRed" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.013, 0)
+mesh = SubResource("OuterRedMesh")
+
+[node name="Cream" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.015, 0)
+mesh = SubResource("CreamMesh")
+
+[node name="InnerRed" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.017, 0)
+mesh = SubResource("InnerRedMesh")
