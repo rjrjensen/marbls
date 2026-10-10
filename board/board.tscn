@@ -7,22 +7,15 @@
 [ext_resource type="PackedScene" path="res://board/hole.tscn" id="5_hole"]
 [ext_resource type="AudioStream" path="res://audio/marble_click.wav" id="6_click"]
 [ext_resource type="AudioStream" path="res://audio/kill_thud.wav" id="7_thud"]
+[ext_resource type="Shader" path="res://board/wood.gdshader" id="8_wood"]
 
-[sub_resource type="StandardMaterial3D" id="WoodMaterial"]
-albedo_color = Color(0.62, 0.42, 0.22, 1)
-roughness = 0.5
+[sub_resource type="ShaderMaterial" id="WoodMaterial"]
+resource_local_to_scene = true
+shader = ExtResource("8_wood")
 
-[sub_resource type="StandardMaterial3D" id="EdgeMaterial"]
-albedo_color = Color(0.55, 0.38, 0.2, 1)
+[sub_resource type="StandardMaterial3D" id="RimMaterial"]
+albedo_color = Color(0.42, 0.267, 0.137, 1)
 roughness = 0.6
-
-[sub_resource type="CylinderMesh" id="BaseMesh"]
-material = SubResource("WoodMaterial")
-top_radius = 10.0
-bottom_radius = 10.0
-height = 0.5
-radial_segments = 96
-rings = 1
 
 [node name="Board" type="Node3D"]
 script = ExtResource("1_script")
@@ -30,9 +23,18 @@ arm_scene = ExtResource("2_arm")
 starting_block_scene = ExtResource("3_block")
 marble_scene = ExtResource("4_marble")
 
-[node name="Base" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
-mesh = SubResource("BaseMesh")
+[node name="Base" type="CSGPolygon3D" parent="."]
+rotation = Vector3(-1.5707964, 0, 0)
+polygon = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+depth = 0.5
+material = SubResource("WoodMaterial")
+
+[node name="Rim" type="CSGPolygon3D" parent="."]
+position = Vector3(0, -0.015, 0)
+rotation = Vector3(-1.5707964, 0, 0)
+polygon = PackedVector2Array(-8.4, -8.4, 8.4, -8.4, 8.4, 8.4, -8.4, 8.4)
+depth = 0.6
+material = SubResource("RimMaterial")
 
 [node name="BullsEye" parent="." instance=ExtResource("5_hole")]
 transform = Transform3D(1.3, 0, 0, 0, 1, 0, 0, 0, 1.3, 0, 0, 0)

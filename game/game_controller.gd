@@ -67,7 +67,7 @@ func new_game(seat_count: int, seed_value: int, teams: bool = false, vs_computer
 	_host = LocalMatchHost.new(game)
 	_host.events_emitted.connect(_on_events)
 	_board.build(_host.state())
-	_camera.frame(_board.radius())
+	_camera.frame(_board.footprint().grow(BoardView.RIM_WIDTH))
 	if _single_human_seat() >= 0:
 		_camera.face(_board.arm_direction(state().player(_single_human_seat()).arm), false)
 	_hud.show_card(null)

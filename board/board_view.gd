@@ -17,6 +17,12 @@ const HOP_SECONDS := 0.13
 const HOP_HEIGHT := 0.45
 ## Sideways distance between ghosts that would sit in the same hole.
 const SHARED_HOLE_SPREAD := 0.35
+## Wood beyond the outermost holes, like the real board's edge.
+const EDGE_MARGIN := 1.2
+## Rounded corners of the board, and the dark rim around it.
+const CORNER_RADIUS := 0.9
+const RIM_WIDTH := 0.35
+const CORNER_SEGMENTS := 8
 
 @export var arm_scene: PackedScene
 @export var starting_block_scene: PackedScene
@@ -30,9 +36,10 @@ var _block_holes: Dictionary[int, Array] = {}
 ## Key "seat/marble" -> view.
 var _marbles: Dictionary[String, MarbleView] = {}
 var _seat_arms: Array[int] = []
-var _radius: float = 10.0
+var _footprint := Rect2(-8.0, -8.0, 16.0, 16.0)
 
-@onready var _base: MeshInstance3D = $Base
+@onready var _base: CSGPolygon3D = $Base
+@onready var _rim: CSGPolygon3D = $Rim
 @onready var _bulls_eye: BoardHole = $BullsEye
 @onready var _pieces: Node3D = $Pieces
 @onready var _marble_layer: Node3D = $Marbles
@@ -77,13 +84,7 @@ func build(state: GameState) -> void:
 		_track_holes[_topology.starting_exit(p.arm)].set_ring_color(color)
 		_track_holes[_topology.own_fast_track_corner(p.arm)].set_ring_color(color.darkened(0.25))
 
-	_radius = 0.0
-	for hole: BoardHole in _holes_in(_pieces):
-		_radius = maxf(_radius, Vector2(hole.global_position.x, hole.global_position.z).length())
-	_radius += 1.0
-	var base_mesh := _base.mesh as CylinderMesh
-	base_mesh.top_radius = _radius
-	base_mesh.bottom_radius = _radius
+	_shape_base()
 
 	for p: PlayerState in state.players:
 		for i: int in p.marbles.size():
@@ -96,9 +97,9 @@ func build(state: GameState) -> void:
 	sync_marbles(state)
 
 
-## Distance from the center to the edge of the board.
-func radius() -> float:
-	return _radius
+## The board's outline on the table (x and z), not counting the rim.
+func footprint() -> Rect2:
+	return _footprint
 
 
 ## Unit vector from the center out along an arm.
@@ -242,6 +243,38 @@ func _on_marble_tapped(view: MarbleView) -> void:
 
 func _on_ghost_tapped(view: MarbleView) -> void:
 	ghost_tapped.emit(view.move_index)
+
+
+## Sizes the wooden slab to hug the holes: a rounded rectangle, like the real
+## boards, with a dark rim around it.
+func _shape_base() -> void:
+	var holes := Rect2()
+	var first: bool = true
+	for hole: BoardHole in _holes_in(_pieces):
+		var at := Vector2(hole.global_position.x, hole.global_position.z)
+		holes = Rect2(at, Vector2.ZERO) if first else holes.expand(at)
+		first = false
+	_footprint = holes.grow(EDGE_MARGIN)
+	_base.polygon = _rounded_rect(_footprint, CORNER_RADIUS)
+	_rim.polygon = _rounded_rect(_footprint.grow(RIM_WIDTH), CORNER_RADIUS + RIM_WIDTH)
+	(_base.material as ShaderMaterial).set_shader_parameter("half_size", _footprint.size / 2.0)
+
+
+## The outline of [param rect] (x and z on the table) with rounded corners, as
+## the slab's polygon. The slab is turned to lie flat, so its polygon's y is
+## the table's -z.
+static func _rounded_rect(rect: Rect2, corner_radius: float) -> PackedVector2Array:
+	var points := PackedVector2Array()
+	var inner: Rect2 = rect.grow(-corner_radius)
+	var corners: Array[Vector2] = [
+		inner.end, Vector2(inner.position.x, inner.end.y), inner.position, Vector2(inner.end.x, inner.position.y),
+	]
+	for i: int in corners.size():
+		for step: int in CORNER_SEGMENTS + 1:
+			var angle: float = (i + float(step) / CORNER_SEGMENTS) * PI / 2.0
+			var at: Vector2 = corners[i] + Vector2(cos(angle), sin(angle)) * corner_radius
+			points.append(Vector2(at.x, -at.y))
+	return points
 
 
 func _arm_angle(arm: int) -> float:

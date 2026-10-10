@@ -12,3 +12,6 @@ Thumbs.db
 
 # Playwright MCP session logs and screenshots
 /.playwright-mcp/
+
+# Claude Code subagent worktrees
+.claude/worktrees/
