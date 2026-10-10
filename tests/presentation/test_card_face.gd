@@ -10,6 +10,8 @@ const SUIT_FILES: Dictionary[Card.Suit, String] = {
 }
 const RED_INK := Color("#c1121f")
 const BLACK_INK := Color("#1b1b1b")
+const JOKER_INK := Color("#5a2a8a")
+const STAR_FILE := "res://ui/cards/art/star.svg"
 
 
 func make_face() -> CardFace:
@@ -30,6 +32,10 @@ func test_every_card_in_a_deck_has_a_face() -> void:
 		var name: String = str(card)
 		if card.is_joker():
 			assert_eq(face.shown_kind(), CardFaceLayout.Kind.JOKER, name)
+			assert_eq(face.shown_pip_count(), 0, name)
+			assert_eq(face.shown_rank_text(), "", name)
+			assert_eq(face.shown_suit_texture().resource_path, STAR_FILE, name)
+			assert_eq(face.shown_ink(), JOKER_INK, name)
 			continue
 		if card.is_face_card():
 			assert_eq(face.shown_kind(), CardFaceLayout.Kind.COURT, name)
@@ -39,8 +45,8 @@ func test_every_card_in_a_deck_has_a_face() -> void:
 			assert_eq(face.shown_pip_count(), mini(card.rank + 1, 10), name)
 		assert_eq(face.shown_rank_text(), Card.RANK_NAMES[card.rank], name)
 		assert_eq(face.shown_suit_texture().resource_path, SUIT_FILES[card.suit], name)
-		var red: bool = card.suit == Card.Suit.HEARTS or card.suit == Card.Suit.DIAMONDS
-		assert_eq(face.ink(), RED_INK if red else BLACK_INK, name)
+		var red: bool = card.suit in [Card.Suit.HEARTS, Card.Suit.DIAMONDS]
+		assert_eq(face.shown_ink(), RED_INK if red else BLACK_INK, name)
 	free_face(face)
 
 

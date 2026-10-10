@@ -11,13 +11,12 @@ const UNIT: float = DESIGN_SIZE.x / CardFaceLayout.CARD_SIZE.x
 const RED_INK := Color("#c1121f")
 const BLACK_INK := Color("#1b1b1b")
 const JOKER_INK := Color("#5a2a8a")
-## Indexed by [enum Card.Suit].
-const SUIT_TEXTURES: Array[Texture2D] = [
-	preload("res://ui/cards/suits/clubs.svg"),
-	preload("res://ui/cards/suits/diamonds.svg"),
-	preload("res://ui/cards/suits/hearts.svg"),
-	preload("res://ui/cards/suits/spades.svg"),
-]
+const SUIT_TEXTURES: Dictionary[Card.Suit, Texture2D] = {
+	Card.Suit.CLUBS: preload("res://ui/cards/suits/clubs.svg"),
+	Card.Suit.DIAMONDS: preload("res://ui/cards/suits/diamonds.svg"),
+	Card.Suit.HEARTS: preload("res://ui/cards/suits/hearts.svg"),
+	Card.Suit.SPADES: preload("res://ui/cards/suits/spades.svg"),
+}
 const STAR_TEXTURE: Texture2D = preload("res://ui/cards/art/star.svg")
 const RANK_FONT_SIZE := 60
 ## "10" is two characters, so it is printed smaller to fit the same corner.
@@ -26,11 +25,13 @@ const TEN_FONT_SIZE := 46
 var _kind: CardFaceLayout.Kind = CardFaceLayout.Kind.PIPS
 var _ink: Color = BLACK_INK
 var _rank_text: String = ""
+var _rank_font_size: int = RANK_FONT_SIZE
 var _suit_texture: Texture2D = null
 var _pip_nodes: Array[TextureRect] = []
 
 @onready var _art: Control = %Art
-@onready var _indices: Array[Control] = [%TopIndex, %BottomIndex]
+@onready var _index_ranks: Array[Label] = [%TopRank, %BottomRank]
+@onready var _index_suits: Array[TextureRect] = [%TopSuit, %BottomSuit]
 @onready var _pips: Control = %Pips
 @onready var _pip_template: TextureRect = %PipTemplate
 @onready var _court: Control = %Court
@@ -48,13 +49,13 @@ func _ready() -> void:
 func show_card(card: Card) -> void:
 	var layout := CardFaceLayout.for_card(card)
 	_kind = layout.kind
+	_rank_font_size = TEN_FONT_SIZE if card.rank == Card.Rank.TEN else RANK_FONT_SIZE
 	if card.is_joker():
 		_ink = JOKER_INK
 		_rank_text = ""
 		_suit_texture = STAR_TEXTURE
 	else:
-		var red: bool = card.suit == Card.Suit.HEARTS or card.suit == Card.Suit.DIAMONDS
-		_ink = RED_INK if red else BLACK_INK
+		_ink = RED_INK if card.is_red() else BLACK_INK
 		_rank_text = Card.RANK_NAMES[card.rank]
 		_suit_texture = SUIT_TEXTURES[card.suit]
 	_show_indices()
@@ -69,6 +70,7 @@ func show_card(card: Card) -> void:
 		_court_suit.self_modulate = _ink
 
 
+# The shown_* queries say what is on the face, for tests and tools.
 func shown_kind() -> CardFaceLayout.Kind:
 	return _kind
 
@@ -92,17 +94,16 @@ func shown_suit_texture() -> Texture2D:
 
 
 ## The colour the rank and suit are printed in.
-func ink() -> Color:
+func shown_ink() -> Color:
 	return _ink
 
 
 func _show_indices() -> void:
-	for index: Control in _indices:
-		var rank := index.get_node("Rank") as Label
+	for rank: Label in _index_ranks:
 		rank.text = _rank_text
-		rank.label_settings.font_size = TEN_FONT_SIZE if _rank_text == "10" else RANK_FONT_SIZE
+		rank.label_settings.font_size = _rank_font_size
 		rank.label_settings.font_color = _ink
-		var suit := index.get_node("Suit") as TextureRect
+	for suit: TextureRect in _index_suits:
 		suit.texture = _suit_texture
 		suit.self_modulate = _ink
 

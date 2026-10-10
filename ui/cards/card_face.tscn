@@ -80,7 +80,6 @@ mouse_filter = 2
 theme_override_styles/panel = SubResource("FaceStyle")
 
 [node name="TopIndex" type="Control" parent="Art"]
-unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 0
 offset_left = 7.5
@@ -90,7 +89,8 @@ offset_bottom = 117.5
 pivot_offset = Vector2(24.375, 51.25)
 mouse_filter = 2
 
-[node name="Rank" type="Label" parent="Art/TopIndex"]
+[node name="TopRank" type="Label" parent="Art/TopIndex"]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 0
 offset_left = -6.0
@@ -102,7 +102,8 @@ label_settings = SubResource("IndexRankSettings")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Suit" type="TextureRect" parent="Art/TopIndex"]
+[node name="TopSuit" type="TextureRect" parent="Art/TopIndex"]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 0
 offset_left = 2.675
@@ -115,7 +116,6 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="BottomIndex" type="Control" parent="Art"]
-unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 0
 offset_left = 193.75
@@ -126,7 +126,8 @@ rotation = 3.14159
 pivot_offset = Vector2(24.375, 51.25)
 mouse_filter = 2
 
-[node name="Rank" type="Label" parent="Art/BottomIndex"]
+[node name="BottomRank" type="Label" parent="Art/BottomIndex"]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 0
 offset_left = -6.0
@@ -138,7 +139,8 @@ label_settings = SubResource("IndexRankSettings")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Suit" type="TextureRect" parent="Art/BottomIndex"]
+[node name="BottomSuit" type="TextureRect" parent="Art/BottomIndex"]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 0
 offset_left = 2.675

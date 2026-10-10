@@ -10,6 +10,7 @@ A tour of the code and the technology, written for someone new to Godot. Decisio
 - [How the board is built](#how-the-board-is-built)
 - [The tilted camera](#the-tilted-camera)
 - [How marbles move (animation)](#how-marbles-move-animation)
+- [How card faces are drawn](#how-card-faces-are-drawn)
 - [Sound](#sound)
 - [Computer opponents](#computer-opponents)
 - [Tests, lint and CI](#tests-lint-and-ci)
@@ -80,6 +81,16 @@ There's no physics; it's all **tweens**. A tween calls a function every frame fo
 - **Longer jumps** (Fast Track hops, swaps) arc higher and take a bit longer.
 - **Kills:** the victim "pops" (a quick scale-up) and flies back to its Starting Block on a tall arc, while the camera does a small shake.
 - **Other tweens:** the pulsing glow, the Draw button pulse, the camera turn, and the card flip. The card flip squeezes the card's width to 0, swaps the back for the face, and grows it back.
+
+## How card faces are drawn
+
+There are no 54 card pictures. One scene, `ui/cards/card_face.tscn` (class `CardFace`), draws any card when you call `show_card(card)`:
+- **The fixed parts live in the scene:** the cream card, the rank and small suit in two corners (the bottom one is the top one turned upside down), the framed crown for J, Q and K, and the Joker's big crown. Open the scene in the editor to see and move them.
+- **The pips are placed by code**, because where they go depends on the rank. `ui/cards/card_face_layout.gd` (`CardFaceLayout`) is plain data: for a card it lists each pip's centre, size and whether it is upside down, in "card units" (the card is 50 wide and 70 tall). `CardFace` copies a hidden template pip once per entry.
+- **Suit symbols are small SVG files** in `ui/cards/suits/`, drawn in white so the scene can tint them red or black (`self_modulate`). They are imported with mipmaps, which keeps them smooth when the card is drawn small.
+- **One size fits all:** the art is laid out at 250x350 pixels and scaled to whatever size the parent gives the `CardFace`, so the same scene works as a big card or a tiny one.
+
+The tests (`tests/presentation/test_card_face_layout.gd`) check that no two pips overlap and that pips stay clear of the corners, with a small gap. To see every face, run `tools/card_sheet.tscn` (F6 in the editor), or save a picture with `godot res://tools/card_sheet.tscn -- --screenshot sheet.png`.
 
 ## Sound
 

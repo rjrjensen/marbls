@@ -64,9 +64,9 @@ const SPOTS: Dictionary[Card.Rank, Array] = {
 ## columns, so they use smaller pips spread a little wider.
 const PIP_AREA := Rect2(18.0, 13.0, 14.0, 44.0)
 const DENSE_PIP_AREA := Rect2(16.0, 13.0, 18.0, 44.0)
-const PIP_SCALE := 0.78
-const DENSE_PIP_SCALE := 0.62
-const ACE_SCALE := 1.9
+const PIP_SCALE := 0.74
+const DENSE_PIP_SCALE := 0.6
+const ACE_SCALE := 1.85
 
 var kind: Kind
 var pips: Array[Pip] = []

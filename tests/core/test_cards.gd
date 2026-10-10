@@ -64,3 +64,11 @@ func test_card_table_matches_the_readme() -> void:
 		assert_eq(rules.plays_again(r), play_again.has(r), "play again: " + Card.RANK_NAMES[rank])
 	assert_true(rules.moves_backward(Card.Rank.FOUR))
 	assert_false(rules.moves_backward(Card.Rank.FIVE))
+
+
+func test_hearts_and_diamonds_are_red() -> void:
+	assert_true(Card.new(Card.Rank.ACE, Card.Suit.HEARTS).is_red())
+	assert_true(Card.new(Card.Rank.TEN, Card.Suit.DIAMONDS).is_red())
+	assert_false(Card.new(Card.Rank.ACE, Card.Suit.SPADES).is_red())
+	assert_false(Card.new(Card.Rank.KING, Card.Suit.CLUBS).is_red())
+	assert_false(Card.new(Card.Rank.JOKER).is_red())
