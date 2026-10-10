@@ -99,3 +99,19 @@ func test_ghosts_that_share_a_hole_are_spread_apart_so_both_can_be_tapped() -> v
 
 func _ground_distance(a: Vector3, b: Vector3) -> float:
 	return Vector2(a.x - b.x, a.z - b.z).length()
+
+
+func test_the_board_hugs_its_holes_with_a_margin() -> void:
+	for seat_count: int in [2, 3, 4, 5, 6, 8]:
+		var board := build_board(seat_count)
+		var footprint: Rect2 = board.footprint()
+		var holes := Rect2()
+		var first: bool = true
+		for hole: BoardHole in board.find_children("*", "BoardHole", true, false):
+			var at := Vector2(hole.global_position.x, hole.global_position.z)
+			holes = Rect2(at, Vector2.ZERO) if first else holes.expand(at)
+			first = false
+		var label: String = "%d players: board %s, holes %s" % [seat_count, footprint, holes]
+		assert_true(footprint.encloses(holes.grow(1.0)), label)
+		assert_true(holes.grow(1.5).encloses(footprint), label)
+		free_board(board)

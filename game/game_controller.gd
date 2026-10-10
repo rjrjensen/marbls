@@ -43,6 +43,8 @@ func _ready() -> void:
 	_board.ghost_tapped.connect(_on_ghost_tapped)
 	_hud.back_pressed.connect(_on_back_pressed)
 	_board.marble_tapped.connect(_on_marble_tapped)
+	_hud.board_area_changed.connect(_camera.fit_inside)
+	_camera.fit_inside(_hud.board_area())
 	new_game(default_seat_count, randi(), false, default_vs_computer)
 
 
@@ -67,7 +69,7 @@ func new_game(seat_count: int, seed_value: int, teams: bool = false, vs_computer
 	_host = LocalMatchHost.new(game)
 	_host.events_emitted.connect(_on_events)
 	_board.build(_host.state())
-	_camera.frame(_board.radius())
+	_camera.frame(_board.footprint().grow(BoardView.RIM_WIDTH))
 	if _single_human_seat() >= 0:
 		_camera.face(_board.arm_direction(state().player(_single_human_seat()).arm), false)
 	_hud.show_card(null)

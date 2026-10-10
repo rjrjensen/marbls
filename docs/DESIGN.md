@@ -570,5 +570,6 @@ Each milestone ends with something playable or testable.
 | Draw animation and current-card flash (needs #26) | [rjrjensen/marbls#28](https://github.com/rjrjensen/marbls/issues/28) |
 | Supabase settings sync (needs #19, #27, accounts) | [rjrjensen/marbls#29](https://github.com/rjrjensen/marbls/issues/29) |
 | Remove the top bar, message line, Draw button and card panel (needs #21, #22, #23, #25, #26, #28) | [rjrjensen/marbls#30](https://github.com/rjrjensen/marbls/issues/30) |
+| Board look from the visual polish design (wood slab, filled holes, groove, Bull's Eye, framing) | [rjrjensen/marbls#33](https://github.com/rjrjensen/marbls/issues/33) |
 
-The last twelve rows are the visual polish pass; see [visual-polish-design.md](visual-polish-design.md) for the design and the order they must be built in.
+The twelve rows from #19 to #30, plus #33, are the visual polish pass; see [visual-polish-design.md](visual-polish-design.md) for the design and the order they must be built in.

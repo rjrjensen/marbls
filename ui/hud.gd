@@ -7,6 +7,9 @@ signal draw_pressed
 ## Start picking a move over (e.g. a different first marble for a Seven).
 signal back_pressed
 signal new_game_requested(seat_count: int, teams: bool, vs_computer: bool)
+## The open screen between the top and bottom bars changed, so the board can
+## be framed inside it.
+signal board_area_changed(area: Rect2)
 
 const MIN_SEATS := 2
 const MAX_SEATS := 8
@@ -20,6 +23,9 @@ var _last_vs_computer: bool = true
 var _draw_pulse: Tween = null
 var _card_face_style: StyleBox
 
+@onready var _root: Control = $Root
+@onready var _top_bar: Control = $Root/TopBar
+@onready var _bottom_bar: Control = $Root/BottomBar
 @onready var _turn_label: Label = %TurnLabel
 @onready var _message_label: Label = %MessageLabel
 @onready var _card: PanelContainer = %Card
@@ -63,6 +69,15 @@ func _ready() -> void:
 		_seat_buttons.add_child(button)
 	_new_game_panel.visible = false
 	_game_over_panel.visible = false
+	for bar: Control in [_root, _top_bar, _bottom_bar]:
+		bar.resized.connect(func() -> void: board_area_changed.emit(board_area()))
+
+
+## The part of the screen the bars leave open for the board.
+func board_area() -> Rect2:
+	var top: float = _top_bar.get_global_rect().end.y
+	var bottom: float = _bottom_bar.get_global_rect().position.y
+	return Rect2(0.0, top, _root.size.x, maxf(bottom - top, 0.0))
 
 
 func show_turn(title: String, color: Color) -> void:
